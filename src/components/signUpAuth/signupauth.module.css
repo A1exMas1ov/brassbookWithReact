@@ -21,3 +21,16 @@
     letter-spacing: -1%;
     text-align: center;
 }
+
+.errorMsg {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #FF4D4D; /* Красный цвет ошибки */
+    font-size: 14px;
+    margin-top: 15px;
+}
+
+.inputError {
+    border: 1px solid #FF4D4D !important; /* Подсветка самих инпутов при ошибке */
+}
