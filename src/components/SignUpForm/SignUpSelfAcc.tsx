@@ -1,98 +1,155 @@
-import React, {useState, useContext} from 'react';
+import { useState, useContext } from 'react';
 import Button from '../button/Button';
 import classes from './signupcorp.module.css';
-import { NavLink } from "react-router-dom";
+import { useNavigate } from "react-router-dom"; // Используем хук для перехода
 import { Context } from '../../main';
+import { FaEye, FaEyeSlash } from 'react-icons/fa';
 
-const SignUpSelfAcc = (e: any) => {
+const SignUpSelfAcc = () => {
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [repeatPassword, setRepeatPassword] = useState('');
     
-    const [email, setEmail] = useState('')
-    const [password, setPassword] = useState('')
-    const [emailDirty, setEmailDirty] = useState(false)
-    const [passwordDirty, setPasswordDirty] = useState(false)
-    const [emailErr, setEmailErr] = useState('емейл не может быть пустым')
-    const [passwordErr, setpasswordlErr] = useState('пароль не может быть пустым')
-    const [RepeatPassword, setRepeatPassword] = useState('')
-    const [RepeatPasswordDirty, setRepeatPasswordDirty] = useState(false)
-    const [repeatPasswordErr, setRepeatPasswordlErr] = useState('пароли должны совпадать')
-    const {store} = useContext(Context)
+    const [emailErr, setEmailErr] = useState('');
+    const [passwordErr, setPasswordErr] = useState('');
+    const [repeatPasswordErr, setRepeatPasswordErr] = useState('');
 
-    const emailHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setEmail(e.target.value)
-        const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-        if(!re.test(String(e.target.value).toLowerCase())){
-            setEmailErr('Некорректный емейл')
-        } else{
-            setEmailErr('')
+    const [showPassword, setShowPassword] = useState(false);
+    const [showRepeatPassword, setShowRepeatPassword] = useState(false);
+    
+    const { store } = useContext(Context);
+    const navigate = useNavigate();
+
+    const validateForm = () => {
+        let isValid = true;
+
+        const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+        if (!email) {
+            setEmailErr('Email не может быть пустым');
+            isValid = false;
+        } else if (!re.test(String(email).toLowerCase())) {
+            setEmailErr('Некорректный email');
+            isValid = false;
+        } else {
+            setEmailErr('');
         }
-    }
 
-    const passwordHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setPassword(e.target.value)
-        if(e.target.value.length < 3 || e.target.value.length > 12){
-            setpasswordlErr('пароль должен быть длиннее 3 и меньше 12 символов')
-            if(!e.target.value.length){
-                setpasswordlErr('Пароль не может быть пустым')
-            }if(e.target.value != RepeatPassword){
-                setRepeatPasswordlErr('пароли должны совпадать')
+        if (!password) {
+            setPasswordErr('Пароль не может быть пустым');
+            isValid = false;
+        } else if (password.length < 8 || password.length > 25) {
+            setPasswordErr('Пароль должен быть от 8 до 25 символов');
+            isValid = false;
+        } else if (!/[A-Z]/.test(password) || !/[a-z]/.test(password) || !/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(password)) {
+            setPasswordErr('Пароль должен содержать заглавную, строчную буквы и спецсимвол');
+            isValid = false;
+        } else {
+            setPasswordErr('');
+        }
+
+        if (repeatPassword !== password) {
+            setRepeatPasswordErr('Пароли должны совпадать');
+            isValid = false;
+        } else {
+            setRepeatPasswordErr('');
+        }
+
+        return isValid;
+    };
+
+    const handleRegistration = async () => {
+        if (validateForm()) {
+            try {
+                await store.registration(email, password);
+                navigate('/signupauth');
+            } catch (e) {
+                console.log(e);
             }
-        }else{
-            setpasswordlErr('')
         }
-    }
+    };
 
-    const repeatPasswordHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setRepeatPassword(e.target.value)
-        if(e.target.value != password ){
-            setRepeatPasswordlErr('пароли должны совпадать')
-        }else{
-            setRepeatPasswordlErr('')
-        }
-    }
-
-    
-    const blurHandler = (e: React.FocusEvent<HTMLInputElement, Element>) => {
-        switch(e.target.name){
-            case 'email':
-                setEmailDirty(true)
-                break
-            case 'password':
-                setPasswordDirty(true)
-                break
-            case 'RepeatPassword':
-                setRepeatPasswordDirty(true)
-                break
-        }
-    }
-
-    return(
-            <form action="" className={"sign-form sign-in-form" + '' }>
+    return (
+        <form onSubmit={(e) => e.preventDefault()} className="sign-form sign-in-form">
             <div className={classes.ChangeAcc}>
-                    <div className={classes.button__corporationact}>Личный аккаунт</div>
-                    <div className={classes.button__corporationacttt}>________________________</div>
+                <div className={classes.button__corporationact}>Личный аккаунт</div>
+                <div className={classes.button__corporationacttt}>________________________</div>
             </div>
-                <div className="sign-form__fields-container">
-                    <div className="sign-form__field">
-                        <label htmlFor="email">Почта</label>
-                        {(emailDirty && emailErr) && <div style={{color: 'red'}}>{emailErr}</div>}
-                        <input onChange={e => emailHandler(e)} value={email} onBlur={e => blurHandler(e)} name="email" id="email" placeholder="Введите вашу почту" className="sign__input" type="email"></input>
-                    </div>
-                    <div className="sign-form__field">
-                        <label htmlFor="password">Пароль</label>
-                        {(passwordDirty && passwordErr) && <div style={{color: 'red'}}>{passwordErr}</div>}
-                        <input onChange={e => passwordHandler(e)} value={password} onBlur={e => blurHandler(e)} name="password" id="password" placeholder="Введите пароль" className="sign__input" type="assword"></input>
-                    </div>
-                    <div className="sign-form__field">
-                        <label htmlFor="RepeatPassword">Повторите Пароль</label>
-                        {(RepeatPasswordDirty && repeatPasswordErr) && <div style={{color: 'red'}}>{repeatPasswordErr}</div>}
-                        <input onChange={e => repeatPasswordHandler(e)} value={RepeatPassword} onBlur={e => blurHandler(e)} name="RepeatPassword" id="RepeatPassword" placeholder="Повторите пароль" className="sign__input" type="assword"></input>
+
+            <div className="sign-form__fields-container">
+                <div className="sign-form__field">
+                    <label htmlFor="email">Почта</label>
+                    {emailErr && <div style={{ color: 'red', fontSize: '12px' }}>{emailErr}</div>}
+                    <input 
+                        onChange={e => setEmail(e.target.value)} 
+                        value={email} 
+                        name="email" 
+                        id="email" 
+                        placeholder="Введите вашу почту" 
+                        className="sign__input" 
+                        type="email"
+                    />
+                </div>
+              
+                <div className="sign-form__field">
+                    <label htmlFor="password">Пароль</label>
+                    {passwordErr && <div style={{ color: 'red', fontSize: '12px' }}>{passwordErr}</div>}
+                    <div style={{ position: 'relative' }}>
+                        <input 
+                            onChange={e => setPassword(e.target.value)} 
+                            value={password} 
+                            name="password" 
+                            id="password" 
+                            placeholder="Введите пароль" 
+                            className="sign__input" 
+                            type={showPassword ? "text" : "password"}
+                            style={{ paddingRight: '50px' }} 
+                        />
+                        <button
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)}
+                            className={classes.button_show_password} 
+                        >
+                            {showPassword ? <FaEyeSlash size={20} /> : <FaEye size={20} />}
+                        </button>
                     </div>
                 </div>
-                <div className="sign-form__btn-container ">
-                <Button onClick={() => store.registration(email, password)} isBtn={true} className="button-type-2 sign-page-button"><NavLink to='/signupauth'>Продолжить</NavLink></Button>
+                
+                <div className="sign-form__field">
+                    <label htmlFor="RepeatPassword">Повторите пароль</label>
+                    {repeatPasswordErr && <div style={{ color: 'red', fontSize: '12px' }}>{repeatPasswordErr}</div>}
+                    <div style={{ position: 'relative' }}>
+                        <input 
+                            onChange={e => setRepeatPassword(e.target.value)} 
+                            value={repeatPassword} 
+                            name="RepeatPassword" 
+                            id="RepeatPassword" 
+                            placeholder="Повторите пароль" 
+                            className="sign__input" 
+                            type={showRepeatPassword ? "text" : "password"}
+                            style={{ paddingRight: '50px' }} 
+                        />
+                        <button
+                            type="button"
+                            onClick={() => setShowRepeatPassword(!showRepeatPassword)}
+                            className={classes.button_show_password} 
+                        >
+                            {showRepeatPassword ? <FaEyeSlash size={20} /> : <FaEye size={20} />}
+                        </button>
+                    </div>
+                </div>
             </div>
-            </form>
-        )
+            
+            <div className="sign-form__btn-container">
+                <Button 
+                    onClick={handleRegistration} 
+                    isBtn={true} 
+                    className="button-type-2 sign-page-button"
+                >
+                    Продолжить
+                </Button>
+            </div>
+        </form>
+    );
 };
 
 export default SignUpSelfAcc;
