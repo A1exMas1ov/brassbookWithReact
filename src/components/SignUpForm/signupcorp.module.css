@@ -45,3 +45,14 @@
     z-index: 2;
     transition: opacity 0.2s ease;
 }
+
+.errorUnder {
+    color: #FF4D4D;
+    font-size: 12px;
+    font-weight: 500;
+    font-family: var(--main-font);
+    display: flex;
+    align-items: center;
+    gap: 4px; /* Расстояние между значком и текстом ошибки */
+    animation: fadeIn 0.3s ease;
+}

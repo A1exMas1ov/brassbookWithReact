@@ -1,9 +1,9 @@
 import { useState, useContext } from 'react';
 import Button from '../button/Button';
 import classes from './signupcorp.module.css';
-import { useNavigate } from "react-router-dom"; // Используем хук для перехода
+import { useNavigate } from "react-router-dom";
 import { Context } from '../../main';
-import { FaEye, FaEyeSlash } from 'react-icons/fa';
+import { FaExclamationCircle, FaEye, FaEyeSlash } from 'react-icons/fa';
 
 const SignUpSelfAcc = () => {
     const [email, setEmail] = useState('');
@@ -22,33 +22,33 @@ const SignUpSelfAcc = () => {
 
     const validateForm = () => {
         let isValid = true;
+        const re = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
 
-        const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
         if (!email) {
-            setEmailErr('Email не может быть пустым');
+            setEmailErr('Заполните обязательное поле');
             isValid = false;
-        } else if (!re.test(String(email).toLowerCase())) {
-            setEmailErr('Некорректный email');
+        } else if (!re.test(email)) {
+            setEmailErr('Почта указана некорректно');
             isValid = false;
         } else {
             setEmailErr('');
         }
 
         if (!password) {
-            setPasswordErr('Пароль не может быть пустым');
+            setPasswordErr('Заполните обязательное поле');
             isValid = false;
         } else if (password.length < 8 || password.length > 25) {
             setPasswordErr('Пароль должен быть от 8 до 25 символов');
             isValid = false;
         } else if (!/[A-Z]/.test(password) || !/[a-z]/.test(password) || !/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(password)) {
-            setPasswordErr('Пароль должен содержать заглавную, строчную буквы и спецсимвол');
+            setPasswordErr('Пароль должен содержать заглавную, строчную букву и спецсимвол');
             isValid = false;
         } else {
             setPasswordErr('');
         }
 
         if (repeatPassword !== password) {
-            setRepeatPasswordErr('Пароли должны совпадать');
+            setRepeatPasswordErr('Пароли не совпадают');
             isValid = false;
         } else {
             setRepeatPasswordErr('');
@@ -76,9 +76,9 @@ const SignUpSelfAcc = () => {
             </div>
 
             <div className="sign-form__fields-container">
+                {/* ПОЛЕ ПОЧТЫ */}
                 <div className="sign-form__field">
                     <label htmlFor="email">Почта</label>
-                    {emailErr && <div style={{ color: 'red', fontSize: '12px' }}>{emailErr}</div>}
                     <input 
                         onChange={e => setEmail(e.target.value)} 
                         value={email} 
@@ -88,11 +88,13 @@ const SignUpSelfAcc = () => {
                         className="sign__input" 
                         type="email"
                     />
+                    {/* Ошибка перенесена ПОД инпут */}
+                    {emailErr && <span className={classes.errorUnder}> <FaExclamationCircle /> {emailErr}</span>}
                 </div>
               
+                {/* ПОЛЕ ПАРОЛЯ */}
                 <div className="sign-form__field">
                     <label htmlFor="password">Пароль</label>
-                    {passwordErr && <div style={{ color: 'red', fontSize: '12px' }}>{passwordErr}</div>}
                     <div style={{ position: 'relative' }}>
                         <input 
                             onChange={e => setPassword(e.target.value)} 
@@ -112,17 +114,19 @@ const SignUpSelfAcc = () => {
                             {showPassword ? <FaEyeSlash size={20} /> : <FaEye size={20} />}
                         </button>
                     </div>
+                    {/* Ошибка перенесена ПОД контейнер с инпутом и кнопкой-глазом */}
+                    {passwordErr && <span className={classes.errorUnder}> <FaExclamationCircle /> {passwordErr}</span>}
                 </div>
                 
+                {/* ПОЛЕ ПОВТОРА ПАРОЛЯ */}
                 <div className="sign-form__field">
-                    <label htmlFor="RepeatPassword">Повторите пароль</label>
-                    {repeatPasswordErr && <div style={{ color: 'red', fontSize: '12px' }}>{repeatPasswordErr}</div>}
+                    <label htmlFor="repeatPassword">Повторите пароль</label>
                     <div style={{ position: 'relative' }}>
                         <input 
                             onChange={e => setRepeatPassword(e.target.value)} 
                             value={repeatPassword} 
-                            name="RepeatPassword" 
-                            id="RepeatPassword" 
+                            name="repeatPassword" 
+                            id="repeatPassword" 
                             placeholder="Повторите пароль" 
                             className="sign__input" 
                             type={showRepeatPassword ? "text" : "password"}
@@ -136,6 +140,8 @@ const SignUpSelfAcc = () => {
                             {showRepeatPassword ? <FaEyeSlash size={20} /> : <FaEye size={20} />}
                         </button>
                     </div>
+                    {/* Ошибка перенесена ПОД контейнер */}
+                    {repeatPasswordErr && <span className={classes.errorUnder}> <FaExclamationCircle /> {repeatPasswordErr}</span>}
                 </div>
             </div>
             
