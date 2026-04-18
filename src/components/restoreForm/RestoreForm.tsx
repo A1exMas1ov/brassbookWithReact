@@ -12,7 +12,7 @@ const RestoreForm: FC = () => {
     const handleClick = (e: any) => {
         e.preventDefault()
         store.checkEmailAndSendCode(email)
-        navigate('/signupauth')
+        navigate('/restoreauth')
     }
 
     return (

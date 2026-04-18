@@ -6,6 +6,7 @@ import SignUpPage from "./components/SignUpPage.tsx";
 import SignUpAuthPage from "./components/SignUpAuthPage.tsx";
 import UserPage from "./components/UserPage.tsx";
 import RestorePage from "./components/RestorePage.tsx"
+import RestoreAuthPage from "./components/RestoreAuthPage.tsx"
 
 function App() {
 
@@ -19,6 +20,7 @@ function App() {
               <Route path="/account" element={<Account />} />
               <Route path="/user" element={<UserPage />} />
               <Route path="/restore" element={<RestorePage />} />
+              <Route path="/restoreauth" element={<RestoreAuthPage />} />
           </Routes>
       </Router>
   )

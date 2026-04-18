@@ -1,0 +1,36 @@
+.div__input {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    margin-top: 32px;
+    margin-bottom: 56px;
+}
+
+.div__input input {
+    border: none;
+    border-radius: 20px;
+    background: rgb(244, 244, 246);
+    padding: 23px 36px 23px 36px;
+    width: 112px;
+    height: 69px;
+    color: rgb(35, 11, 63);
+    font-family: Inter;
+    font-size: 24px;
+    font-weight: 400;
+    line-height: 145%;
+    letter-spacing: -1%;
+    text-align: center;
+}
+
+.errorMsg {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #FF4D4D; /* Красный цвет ошибки */
+    font-size: 14px;
+    margin-top: 15px;
+}
+
+.inputError {
+    border: 1px solid #FF4D4D !important; /* Подсветка самих инпутов при ошибке */
+}
