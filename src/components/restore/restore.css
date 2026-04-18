@@ -1,0 +1,53 @@
+.sign-in {
+  color: black;
+  padding-top: 155px;
+}
+.sign-in__title {
+  color: #230B3F;
+  font-family: var(--accent-font);
+  font-size: 32px;
+  font-weight: 900;
+  line-height: 110%;
+  letter-spacing: -0.64px;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+.sign-in__backlink {
+  color: rgba(25, 6, 54, 0.3);
+  font-family: var(--main-font);
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: -0.16px;
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+}
+.sign-in__text {
+  margin-bottom: 18px;
+  color: #534068;
+  font-family: var(--main-font);
+  font-size: 20px;
+  font-weight: 400;
+  letter-spacing: -0.4px;
+  margin-bottom: 16px;
+}
+.sign-in__text a {
+  color: #6B27FF;
+  font-weight: 600;
+}
+.sign-in__forget-container {
+  color: rgba(25, 6, 54, 0.3);
+  font-family: var(--main-font);
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 145%;
+  letter-spacing: -0.16px;
+  margin-bottom: 16px;
+}
+.sign-in__forget-title {
+  display: inline-block;
+  margin-right: 8px;
+}
+.sign-in__forget-link {
+  text-decoration: underline;
+}/*# sourceMappingURL=signIn.css.map */

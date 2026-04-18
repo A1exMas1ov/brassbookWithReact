@@ -10,6 +10,7 @@ export default class Store {
     user = {} as IUser;
     isAuth = false;
     isLoading = false;
+     restoreEmail = '';
 
     constructor() {
         makeAutoObservable(this);
@@ -76,6 +77,32 @@ export default class Store {
             this.setLoading(false);
         }
     }
+
+    async checkEmailAndSendCode(email: string) {
+        
+        // ===== ЗАГЛУШКА =====
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            if (!email || !email.includes('@')) {
+                throw new Error('Введите корректный email');
+            }
+            
+            this.restoreEmail = email;
+            console.log(`Mock: Код для ${email} - 123456`);
+            alert(`Демо-режим: Ваш код подтверждения - 123456`);
+            return true;
+        // ========== когда появится бэк) ==========
+        // const response = await AuthService.checkEmail(email);
+        // 
+        // if (!response.data.exists) {
+        //     throw new Error('Пользователь с таким email не найден');
+        // }
+        // 
+        // await AuthService.sendRestoreCode(email);
+        // this.restoreEmail = email;
+        // return true;
+        
+    }   
 
     async logout() {
         try {

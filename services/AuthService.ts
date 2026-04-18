@@ -12,6 +12,11 @@ export default class AuthService {
         return $api.post<AuthResponse>('/registration', data);  // ВОТ ТУТ указывается путь (эндпоинт)
     }
 
+    static async checkEmail(email: string) {
+        return $api.post<AuthResponse>('/check-email', { email });
+    }
+
+
     // Исправлено: используем void и просто дожидаемся выполнения запроса
     static async logout(): Promise<void> {
         await $api.post('/logout');

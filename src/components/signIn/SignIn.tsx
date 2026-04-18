@@ -1,6 +1,7 @@
 import { NavLink, useSearchParams } from "react-router-dom";
 import './signIn.css'
 import SignInForm from "../signInForm/SignInForm.tsx";
+import Restore from "../restore/Restore.tsx";
 import ImagePipe from "../UI/ImagePipe.tsx";
 
 function SignIn() {
@@ -30,18 +31,19 @@ function SignIn() {
                         </p>
                     ) : (
                         <p className="sign-in__text">
-                            Выберите тип регистрации и введите необходимые данные. <br/>
-                            Вы уже зарегистрированы на сайте? <NavLink to='/signup'>Зарегистрироваться</NavLink>
+                            Войдите в систему, чтобы начать пользоваться сервисом. <br/>
+                            Вы еще не зарегистрированы на сайте? <NavLink to='/signup'>Зарегистрироваться</NavLink>
                         </p>
                     )}
 
                     <div className="sign-in__forget-container">
                         <div className="sign-in__forget-title">Забыли пароль?</div>
-                        <a href="" className="sign-in__forget-link">Восстановить</a>
+                        <a href="" className="sign-in__forget-link"><NavLink to='/restore'>Восстановить</NavLink></a>
                     </div>
                 </div>
 
                 <SignInForm />
+                <Restore />
                 <ImagePipe />
             </div>
         </div>
