@@ -1,4 +1,5 @@
 import Button from "../button/Button.tsx";
+import EyeToggle from "../UI/EyeToggle"; 
 import {useState, FC, useContext} from "react";
 import { useNavigate } from "react-router-dom";
 import { Context } from "../../main.tsx";
@@ -70,7 +71,7 @@ const RestoreFormWithPass: FC = () => {
                             onClick={() => setShowPassword(!showPassword)}
                             className="button_show_password"
                         >
-                            {showPassword ? <FaEyeSlash size={20} /> : <FaEye size={20} />}
+                            <EyeToggle show={showPassword} onToggle={() => setShowPassword(!showPassword)} />
                         </button>
                     </div>
                 </div>
@@ -94,7 +95,7 @@ const RestoreFormWithPass: FC = () => {
                             onClick={() => setShowRepeatPassword(!showRepeatPassword)}
                             className="button_show_password"
                         >
-                            {showRepeatPassword ? <FaEyeSlash size={20} /> : <FaEye size={20} />}
+                            <EyeToggle show={showRepeatPassword} onToggle={() => setShowRepeatPassword(!showRepeatPassword)} />
                         </button>
                 </div>
             </div>

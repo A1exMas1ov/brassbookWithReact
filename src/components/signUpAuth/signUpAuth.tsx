@@ -29,11 +29,18 @@ function SignUpAuth() {
         const newCode = [...code];
         newCode[index] = value;
         setCode(newCode);
-        setErrorCode(false); // Убираем ошибку при новом вводе
+        setErrorCode(false);
 
         if (value && index < 5) {
             const nextInput = document.getElementById(`code-${index + 1}`);
             nextInput?.focus();
+        }
+    };
+    const handleKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === 'Backspace' && !code[index] && index > 0) {
+            // Переход на предыдущую клетку
+            const prevInput = document.getElementById(`code-${index - 1}`);
+            prevInput?.focus();
         }
     };
 
@@ -98,6 +105,7 @@ function SignUpAuth() {
                                     value={num}
                                     className={errorCode ? classes.inputError : ''} // Добавляем класс ошибки если надо
                                     onChange={(e) => handleChange(idx, e.target.value)}
+                                    onKeyDown={(e) => handleKeyDown(idx, e)}
                                 />
                             </label>
                         ))}
