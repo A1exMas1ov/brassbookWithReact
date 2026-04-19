@@ -4,6 +4,7 @@ import classes from "./signupgrid.module.css";
 import { useNavigate } from "react-router-dom";
 import { FaExclamationCircle, FaEye, FaEyeSlash } from 'react-icons/fa';
 import { Context } from "../../main";
+import { validateEmail, validatePassword, validatePasswordMatch, validateName, validateCompanyName, validatePosition, validateINN} from "../utils/validation";
 
 function SignUpForm({ className }: { className?: string }) {
     const navigate = useNavigate();
@@ -31,44 +32,37 @@ function SignUpForm({ className }: { className?: string }) {
 
     const validateStep1 = () => {
         const newErrors: Record<string, string> = {};
-        const nameRegex = /^[а-яА-Яa-zA-Z\s]+$/;
-        const InnRegex = /^\d{10}$|^\d{12}$/;
-
-        if (!values.name) newErrors.name = "Заполните обязательное поле";
-        else if (!nameRegex.test(values.name) || values.name.length > 25) newErrors.name = "Имя содержит от 1 до 25 букв";
-            
-        if (!values.secondName) newErrors.secondName = "Заполните обязательное поле";
-        else if (!nameRegex.test(values.secondName) || values.secondName.length > 25) newErrors.secondName = "Фамилия содержит от 1 до 25 букв";
-
-        if (!values.companyName) newErrors.companyName = "Заполните обязательное поле";
-        else if (values.companyName.length > 50) newErrors.companyName = "Название компании до 50 символов";
-
-        if (!values.position) newErrors.position = "Заполните обязательное поле";
-        else if (values.position.length > 50) newErrors.position = "Должность до 50 символов";
-
-        if (!values.inn) newErrors.inn = "Заполните обязательное поле";
-        else if (!InnRegex.test(values.inn)) newErrors.inn = "ИНН должен содержать 10 или 12 цифр";
-
+        
+        const nameValidation = validateName(values.name);
+        if (!nameValidation.isValid) newErrors.name = nameValidation.error;
+        
+        const secondNameValidation = validateName(values.secondName);
+        if (!secondNameValidation.isValid) newErrors.secondName = secondNameValidation.error;
+        
+        const companyValidation = validateCompanyName(values.companyName);
+        if (!companyValidation.isValid) newErrors.companyName = companyValidation.error;
+        
+        const positionValidation = validatePosition(values.position);
+        if (!positionValidation.isValid) newErrors.position = positionValidation.error;
+        
+        const innValidation = validateINN(values.inn);
+        if (!innValidation.isValid) newErrors.inn = innValidation.error;
+        
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
 
     const validateStep2 = () => {
         const newErrors: Record<string, string> = {};
-        const re = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
-
-        if (!values.email) newErrors.email = 'Заполните обязательное поле';
-        else if (!re.test(values.email)) newErrors.email = 'Почта указана некорректно';
-
-        if (!values.password) newErrors.password = 'Заполните обязательное поле';
-        else if (values.password.length < 8 || values.password.length > 25) newErrors.password = 'Пароль должен быть от 8 до 25 символов';
-        else if (!/[A-Z]/.test(values.password) || !/[a-z]/.test(values.password) || !/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(values.password)) {
-            newErrors.password = 'Нужны заглавные, строчные и спецсимвол';
-        }
-
-        if (values.repeatPassword !== values.password) {
-            newErrors.repeatPassword = 'Пароли не совпадают';
-        }
+        
+        const emailValidation = validateEmail(values.email);
+        if (!emailValidation.isValid) newErrors.email = emailValidation.error;
+        
+        const passwordValidation = validatePassword(values.password);
+        if (!passwordValidation.isValid) newErrors.password = passwordValidation.error;
+        
+        const matchValidation = validatePasswordMatch(values.password, values.repeatPassword);
+        if (!matchValidation.isValid) newErrors.repeatPassword = matchValidation.error;
         
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;

@@ -1,9 +1,10 @@
 import { useState, useContext } from 'react';
 import Button from '../button/Button';
 import classes from './signupcorp.module.css';
-import { useNavigate } from "react-router-dom"; // Используем хук для перехода
+import { useNavigate } from "react-router-dom";
 import { Context } from '../../main';
 import { FaExclamationCircle, FaEye, FaEyeSlash } from 'react-icons/fa';
+import { validateEmail, validatePassword, validatePasswordMatch } from "../utils/validation";
 
 const SignUpSelfAcc = () => {
     const [email, setEmail] = useState('');
@@ -21,40 +22,26 @@ const SignUpSelfAcc = () => {
     const navigate = useNavigate();
 
     const validateForm = () => {
-        let isValid = true;
-
-        const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-        if (!email) {
-            setEmailErr('Заполните обязательное поле');
-            isValid = false;
-        } else if (!re.test(String(email).toLowerCase())) {
-            setEmailErr('Почта указана некорректно');
-            isValid = false;
-        } else {
-            setEmailErr('');
+        let isValidate = true;
+        const emailValidation = validateEmail(email);
+        if (!emailValidation.isValid) {
+            setEmailErr(emailValidation.error);
+            isValidate = false;
         }
-
-        if (!password) {
-            setPasswordErr('Заполните обязательное поле');
-            isValid = false;
-        } else if (password.length < 8 || password.length > 25) {
-            setPasswordErr('Пароль должен быть от 8 до 25 символов');
-            isValid = false;
-        } else if (!/[A-Z]/.test(password) || !/[a-z]/.test(password) || !/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(password)) {
-            setPasswordErr('Пароль должен состоять из букв верхнего и нижнего регистра и хотя бы одного символа');
-            isValid = false;
-        } else {
-            setPasswordErr('');
+        
+        const passwordValidation = validatePassword(password);
+        if (!passwordValidation.isValid) {
+            setPasswordErr(passwordValidation.error);
+            isValidate = false;
         }
-
-        if (repeatPassword !== password) {
-            setRepeatPasswordErr('Пароли не совпадают');
-            isValid = false;
-        } else {
-            setRepeatPasswordErr('');
+        
+        const matchValidation = validatePasswordMatch(password, repeatPassword);
+        if (!matchValidation.isValid) {
+            setRepeatPasswordErr(matchValidation.error);
+            isValidate = false;
         }
-
-        return isValid;
+        
+        return isValidate;
     };
 
     const handleRegistration = async () => {

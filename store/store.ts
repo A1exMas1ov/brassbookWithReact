@@ -30,10 +30,27 @@ export default class Store {
 
     async login(email: string, password: string) {
         try {
-            const response = await AuthService.login(email, password);  // ВОТ ТУТ происходит сам "звонок" на бэк
-            localStorage.setItem('token', response.data.access_token);
-            this.setAuth(true);
-            this.setUser(response.data.user);
+            // ===== ЗАГЛУШКА (пока нет бэка) =====
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            // Простая проверка для теста
+            // Можно войти с любыми данными, или только с конкретными
+            if (email && password) {
+                const mockToken = 'mock_token_' + Date.now();
+                localStorage.setItem('token', mockToken);
+                this.setAuth(true);
+                this.setUser({ 
+                    email: email, 
+                    id: 'mock_id_' + Date.now(), 
+                    isActivated: true 
+                } as IUser);
+                return;
+            }
+            
+            // const response = await AuthService.login(email, password);  // ВОТ ТУТ происходит сам "звонок" на бэк
+            // localStorage.setItem('token', response.data.access_token);
+            // this.setAuth(true);
+            // this.setUser(response.data.user);
         } catch (e: any) {
             console.error("Login error:", e.response?.data?.message);
             throw e; // Пробрасываем ошибку в компонент
@@ -83,10 +100,6 @@ export default class Store {
         // ===== ЗАГЛУШКА =====
             await new Promise(resolve => setTimeout(resolve, 1000));
             
-            if (!email || !email.includes('@')) {
-                throw new Error('Введите корректный email');
-            }
-            
             this.restoreEmail = email;
             console.log(`Mock: Код для ${email} - 123456`);
             alert(`Демо-режим: Ваш код подтверждения - 123456`);
@@ -103,6 +116,31 @@ export default class Store {
         // return true;
         
     }   
+
+    async resetPassword(newPassword: string, confirmPassword: string) {     
+        this.setLoading(true);
+        try {
+            // ===== ЗАГЛУШКА =====
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            console.log(`Mock: Пароль изменен для ${this.restoreEmail}`);
+            alert(`Демо-режим: Пароль успешно изменен!`);
+            
+            const savedEmail = this.restoreEmail;
+            this.restoreEmail = '';
+            return true;
+            
+            // ===== РЕАЛЬНЫЙ КОД =====
+            // await AuthService.resetPassword(this.restoreEmail, newPassword);
+            // this.restoreEmail = '';
+            // return true;
+        } catch (e: any) {
+            console.error("Reset password error:", e.message);
+            throw e;
+        } finally {
+            this.setLoading(false);
+        }
+    }
 
     async logout() {
         try {

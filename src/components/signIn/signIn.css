@@ -51,3 +51,14 @@
 .sign-in__forget-link {
   text-decoration: underline;
 }/*# sourceMappingURL=signIn.css.map */
+
+.errorUnder {
+    color: #F37979;
+    font-size: 12px;
+    font-weight: 500;
+    font-family: var(--main-font);
+    display: flex;
+    align-items: center;
+    gap: 4px; /* Расстояние между значком и текстом ошибки */
+    animation: fadeIn 0.3s ease;
+}

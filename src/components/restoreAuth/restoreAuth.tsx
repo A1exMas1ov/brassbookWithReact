@@ -7,12 +7,12 @@ import { Context } from "../../main.tsx";
 
 function RestoreAuth() {
     const { store } = useContext(Context);
-    const navigate = useNavigate(); // Для перехода на страницу входа
+    const navigate = useNavigate();
     
     const [code, setCode] = useState(['', '', '', '', '', '']);
     const [timeLeft, setTimeLeft] = useState(60);
     const [canResend, setCanResend] = useState(false);
-    const [errorCode, setErrorCode] = useState(false); // Состояние ошибки кода
+    const [errorCode, setErrorCode] = useState(false);
 
     useEffect(() => {
         if (timeLeft > 0) {
@@ -47,8 +47,7 @@ function RestoreAuth() {
         const fullCode = code.join('');
     
         if (fullCode === "123456") {
-            // Переходим на вход и передаем в URL параметр success
-            navigate('/signin?success=true'); 
+            navigate('/restore?success=true'); 
         } else {
             setErrorCode(true);
         }

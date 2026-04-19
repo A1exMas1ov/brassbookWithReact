@@ -16,6 +16,19 @@ export default class AuthService {
         return $api.post<AuthResponse>('/check-email', { email });
     }
 
+    // Отправка кода на почту
+    static async sendRestoreCode(email: string): Promise<AxiosResponse<{ message: string }>> {
+        return $api.post<{ message: string }>('/send-restore-code', { email });
+    }
+
+    // Проверка кода подтверждения
+    static async verifyRestoreCode(email: string, code: string): Promise<AxiosResponse<{ isValid: boolean }>> {
+        return $api.post<{ isValid: boolean }>('/verify-restore-code', { email, code });
+    }
+
+    static async resetPassword(email: string, newPassword: string): Promise<AxiosResponse<{ message: string }>> {
+        return $api.post<{ message: string }>('/reset-password', { email, newPassword });
+    }
 
     // Исправлено: используем void и просто дожидаемся выполнения запроса
     static async logout(): Promise<void> {

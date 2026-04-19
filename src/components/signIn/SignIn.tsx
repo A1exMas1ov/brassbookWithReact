@@ -1,13 +1,12 @@
 import { NavLink, useSearchParams } from "react-router-dom";
 import './signIn.css'
 import SignInForm from "../signInForm/SignInForm.tsx";
-import Restore from "../restore/Restore.tsx";
 import ImagePipe from "../UI/ImagePipe.tsx";
 
 function SignIn() {
     const [searchParams] = useSearchParams();
-    // Проверяем, есть ли в URL ?success=true
     const isSuccess = searchParams.get('success') === 'true';
+    const isRecovery = searchParams.get('recovery') === 'true';
 
     return (
         <div className="sign-in">
@@ -20,12 +19,11 @@ function SignIn() {
                         {isSuccess ? "На главную" : "Вернуться на главную"}
                     </NavLink>
 
-                    {/* Если регистрация успешна, выводим новый заголовок капсом */}
                     <h1 className={"sign-in__title"}>
-                        {isSuccess ? "РЕГИСТРАЦИЯ ПРОШЛА УСПЕШНО!" : "ВХОД"}
+                        {isSuccess ? "РЕГИСТРАЦИЯ ПРОШЛА УСПЕШНО!" : isRecovery ? "Пароль успешно изменен!" : "ВХОД"}
                     </h1>
 
-                    {isSuccess ? (
+                    {(isSuccess || isRecovery )? (
                         <p className="sign-in__text">
                             Войдите в систему, чтобы начать пользоваться сервисом.
                         </p>
@@ -43,7 +41,6 @@ function SignIn() {
                 </div>
 
                 <SignInForm />
-                <Restore />
                 <ImagePipe />
             </div>
         </div>

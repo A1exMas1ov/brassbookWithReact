@@ -35,3 +35,17 @@
   font-weight: 400;
   letter-spacing: -0.16px;
 }
+.errorUnder {
+    color: #F37979;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    animation: fadeIn 0.3s ease;
+    font-family: Nunito;
+    font-weight: 500;
+    font-style: Medium;
+    font-size: 14px;
+    line-height: 110.00000000000001%;
+    letter-spacing: -2%;
+}
+

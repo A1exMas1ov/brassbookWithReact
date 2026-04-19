@@ -3,23 +3,31 @@ import React, {useState, FC, useContext} from "react";
 import axios from "axios";
 import { NavLink, useNavigate } from "react-router-dom";
 import { Context } from "../../main.tsx";
+import { FaExclamationCircle } from "react-icons/fa";
 
 const RestoreForm: FC = () => {
 
     const [email, setEmail] = useState<string>('')
+    const [emailErr, setEmailErr] = useState('');
     const navigate = useNavigate()
     const {store} = useContext(Context)
-    const handleClick = (e: any) => {
-        e.preventDefault()
-        store.checkEmailAndSendCode(email)
-        navigate('/restoreauth')
+
+    const handleClick = () => {
+        if (!email) {
+            setEmailErr('Заполните обязательное поле')
+        }
+        else {
+            store.checkEmailAndSendCode(email)
+            navigate('/restoreauth')
+        }
     }
 
     return (
-        <form action="" className={"sign-form sign-in-form" + ''}>
+        <form onSubmit={(e) => e.preventDefault()} className={"sign-form sign-in-form" + ''}>
             <div className="sign-form__fields-container">
                 <div className="sign-form__field">
                     <label htmlFor="email">Почта</label>
+                    {emailErr && <span className="errorUnder"> <FaExclamationCircle /> {emailErr}</span>}
                     <input value={email} onChange={e => setEmail(e.target.value)} name="email" id="email" placeholder="Введите вашу почту" className="sign__input" type="email"></input>
                 </div>
             </div>

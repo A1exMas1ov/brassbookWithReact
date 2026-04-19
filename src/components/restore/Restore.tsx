@@ -1,13 +1,13 @@
 import { NavLink, useSearchParams } from "react-router-dom";
-import RestoreForm from "../restoreForm/RestoreForm.tsx";
 import './restore.css'
 
 import ImagePipe from "../UI/ImagePipe.tsx";
+import RestoreForm from "../restoreForm/RestoreForm";
+import RestoreFormWithPass from "../restoreForm/RestoreFormWithPass.tsx";
 
 function Restore() {
-    // const [searchParams] = useSearchParams();
-    // Проверяем, есть ли в URL ?success=true
-    //const isSuccess = searchParams.get('success') === 'true';
+    const [searchParams] = useSearchParams();
+    const isSuccess = searchParams.get('success') === 'true';
 
     return (
         <div className="sign-in">
@@ -20,13 +20,17 @@ function Restore() {
                     </NavLink>
 
                     <h1 className={"sign-in__title"}>Восстановление пароля</h1>
+                    {!isSuccess ? ( 
                     <p className="sign-in__text">Введите почту, которую вы указывали при регистрации. <br/>
                        Вы еще не зарегистрированы на сайте? <NavLink to='/signup'>Зарегистрироваться</NavLink>
-                    </p>
+                    </p> ) :
+                    (
+                        <p className="sign-in__text">Придумайте новый пароль. <br/></p>
+                    )}
                     
                 </div>
-
-                <RestoreForm />
+                {!isSuccess ? (<RestoreForm />) : (<RestoreFormWithPass/>)}
+                
                 <ImagePipe />
             </div>
         </div>
