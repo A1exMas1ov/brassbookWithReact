@@ -209,15 +209,6 @@ body {
 
 .a__exit:hover { color: rgb(107, 39, 255); }
 
-.footer {
-    width: 100%;
-    height: 76px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 24px 60px;
-    box-sizing: border-box;
-}
 
 .text__main {
     color: var(--font-color);
@@ -231,4 +222,36 @@ body {
 .activeLink {
     color: rgb(107, 39, 255) !important;
     background-color: #F4F4F6;
+}
+
+.footer {
+    width: 100%;
+    height: 76px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 24px 60px;
+    box-sizing: border-box;
+    background-color: #EBEBEE;
+}
+
+.footer__logo {
+    opacity: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(35, 11, 63, 0.3);
+    font-family: var(--main-font);
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.footer__copy {
+    color: rgba(35, 11, 63, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    font-size: 16px;
+    font-family: var(--main-font);
+    font-weight: medium;
 }

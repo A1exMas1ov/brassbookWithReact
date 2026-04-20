@@ -66,7 +66,10 @@ function User() {
             <div className={classes.player}></div>
           </div>
         </div>
-        <footer className={classes.footer}></footer>
+        <footer className={classes.footer}>
+          <span className={classes.footer__logo}>BrassBook</span>
+          <span className={classes.footer__copy}>©2019-2024, Brassbook.Все права защищены</span>
+        </footer>
       </div>
     </>
   );
