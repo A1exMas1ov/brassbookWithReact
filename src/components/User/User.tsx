@@ -58,7 +58,22 @@ function User() {
       <div className={classes.wrapper}>
         <div className={classes.main__area}>
           <div className={classes.left__column}>
-            <div className={classes.card__content}></div>
+            <div className={classes.card__content}>
+              <img src=".\src\assets\img\user_card_angle.png" className={classes.card__decoration} alt="" />
+                <div className={classes.card__inner}>
+                  <div className={classes.card__photo}></div>
+                  <div className={classes.card__info}>
+                    <div className={classes.card__info__main}>
+                        <div className={classes.card__info__name}></div>
+                        <div className={classes.card__info__extra}></div>
+                    </div>
+                    <div className={classes.card__buttons}>
+                      <button className={classes.button__edit__data}>Редактировать личные данные <IconArrow /></button>
+                      <button className={classes.button__edit__data}>Изменить пароль<IconArrow /></button>
+                    </div>
+                  </div>
+                </div>
+            </div>
             <div className={classes.tracks}></div>
           </div>
           <div className={classes.right__column}>
