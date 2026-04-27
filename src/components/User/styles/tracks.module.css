@@ -1,0 +1,308 @@
+/* tracks.module.css — Альбомы и треки */
+
+.tracks {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* ── Быстрые коллекции (Избранное / Мои записи) ── */
+.collections {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+}
+
+.collection__card {
+  flex: 1;
+  height: 160px;
+  background: var(--color-surface);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0 8px 16px;
+  box-sizing: border-box;
+  position: relative;
+}
+
+.collection__info {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  z-index: 1;
+}
+
+.collection__title {
+  color: var(--font-color);
+  font-family: var(--main-font);
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.44px;
+  line-height: 1.2;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.collection__count {
+  color: var(--font-color-muted);
+  font-family: var(--main-font);
+  font-size: 18px;
+  font-weight: 500;
+  letter-spacing: -0.36px;
+  margin: 0;
+}
+
+.collection__image {
+  width: 174px;
+  height: 160px;
+  object-fit: cover;
+  flex-shrink: 0;
+  margin: -8px 0;
+}
+
+/* ── Секция альбомов ── */
+.albums__section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-top: 16px;
+  background: var(--color-surface);
+  border-radius: var(--radius-card);
+  padding: 16px;
+  box-sizing: border-box;
+}
+
+.albums__title {
+  color: var(--font-color);
+  font-family: var(--main-font);
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.44px;
+  margin: 0;
+}
+
+.albums__description {
+  color: rgba(83, 64, 104, 1);
+  font-family: var(--main-font);
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: -0.28px;
+  line-height: 1.4;
+  margin: 0;
+}
+
+.albums__description p {
+  margin: 0;
+}
+
+/* ── Поиск ── */
+.search__bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  background: var(--color-surface);
+  border-radius: var(--radius-inner);
+  border: 1px solid var(--color-border-bg);
+  box-sizing: border-box;
+}
+
+.search__icon {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  color: var(--font-color-muted);
+}
+
+.search__input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: var(--main-font);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--font-color);
+  letter-spacing: -0.28px;
+}
+
+.search__input::placeholder {
+  color: var(--font-color-muted);
+}
+
+/* ── Сортировка ── */
+.sort__bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 6px;
+}
+
+.sort__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 40px;
+  border: none;
+  cursor: pointer;
+  font-family: var(--main-font);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.28px;
+  transition: background-color 0.15s ease, color 0.15s ease;
+  background: var(--color-surface);
+  color: rgba(44, 57, 105, 1);
+}
+
+.sort__btn--active {
+  background: var(--color-accent);
+  color: #ffffff;
+  box-shadow: 0 2px 4px rgba(107, 39, 255, 0.1);
+}
+
+.sort__btn__icon {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+
+/* ── Сетка альбомов ── */
+.albums__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 9px;
+}
+
+.album__card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.album__cover {
+  width: 100%;
+  aspect-ratio: 1 / 0.8;
+  border-radius: var(--radius-inner);
+  overflow: hidden;
+  background: var(--color-bg);
+  background-size: cover;
+  background-position: center;
+  position: relative;
+}
+
+.album__edit__btn {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(12px);
+  color: #ffffff;
+  font-family: var(--main-font);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: -0.24px;
+  transition: background-color 0.15s ease;
+}
+
+.album__edit__btn:hover {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.album__edit__icon {
+  width: 16px;
+  height: 16px;
+}
+
+.album__name {
+  color: var(--font-color);
+  font-family: var(--main-font);
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.3px;
+  line-height: 1.28;
+  margin: 0;
+}
+
+.album__count {
+  color: var(--font-color-muted);
+  font-family: var(--main-font);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -0.26px;
+  margin: 0;
+}
+
+/* ── Кнопка "Создать альбом" ── */
+.album__create {
+  width: 100%;
+  aspect-ratio: 1 / 0.8;
+  border-radius: var(--radius-inner);
+  border: 1.5px dashed rgba(35, 11, 63, 0.3);
+  background: rgba(255, 255, 255, 0.5);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  color: rgba(181, 174, 192, 1);
+  font-family: var(--main-font);
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: -0.3px;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.album__create:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+.album__create__plus {
+  width: 16px;
+  height: 16px;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.album__create__plus::before,
+.album__create__plus::after {
+  content: "";
+  position: absolute;
+  background: currentColor;
+  border-radius: 2px;
+}
+
+.album__create__plus::before {
+  width: 2px;
+  height: 16px;
+  top: 0;
+  left: 7px;
+}
+
+.album__create__plus::after {
+  width: 16px;
+  height: 2px;
+  top: 7px;
+  left: 0;
+}
+
+/* ── Адаптив ── */
+@media (max-width: 1199px) {
+  .collection__title { font-size: 18px; }
+  .collection__count { font-size: 15px; }
+  .collection__image { width: 130px; }
+  .albums__grid      { grid-template-columns: repeat(2, 1fr); }
+}
