@@ -1,7 +1,7 @@
 import axios from "axios";
-import { AuthResponse } from "../models/response/AuthResponse";
+import { TokenResponse } from "../models/response/TokenResponse.ts";
 
-export const API_URL = 'http://localhost:5000' // ВОТ ТУТ указан адрес твоего бэкенда
+export const API_URL = 'http://localhost:8080/api/v1'
 
 const $api = axios.create({
     withCredentials: true,
@@ -17,12 +17,23 @@ $api.interceptors.response.use((config) => {
     return config
 }, async (error) => {
     const originalRequest = error.config
-    if(error.response.status == 401){
-        const response = await axios.get<AuthResponse>(`${API_URL}/refresh`, {withCredentials: true})
-        localStorage.setItem('token', response.data.access_token)
-        return $api.request(originalRequest)
+    if (error.response?.status === 401) {
+        try {
+            const refreshToken = localStorage.getItem('refreshToken')
+            const response = await axios.get<TokenResponse>(`${API_URL}/token/refresh`, {
+                headers: { Authorization: `Bearer ${refreshToken}` }
+            })
+            localStorage.setItem('token', response.data.accessToken)
+            localStorage.setItem('refreshToken', response.data.refreshToken)
+            originalRequest.headers.Authorization = `Bearer ${response.data.accessToken}`
+            return $api.request(originalRequest)
+        } catch (refreshError) {
+            localStorage.removeItem('token')
+            localStorage.removeItem('refreshToken')
+            window.location.href = '/login'
+        }
     }
+    return Promise.reject(error)
 });
-
 
 export default $api;

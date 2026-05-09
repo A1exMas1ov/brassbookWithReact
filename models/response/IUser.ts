@@ -1,8 +1,5 @@
-export interface IUser{
+export interface IUser {
     email: string;
-    isActivated: boolean; // Подтвержден ли email
-    id: string;
+    isActivated: boolean;
+    id: number; // бэк возвращает Long — это number во фронте, не string
 }
-
-// TypeScript интерфейс, который описывает, как выглядит объект пользователя. 
-// Бэкенд должен возвращать пользователя именно в таком формате.
