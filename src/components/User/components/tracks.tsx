@@ -1,12 +1,9 @@
 // components/Tracks/Tracks.tsx
 import { useId, useMemo, useState } from "react";
 import tracksClasses from "../styles/tracks.module.css";
-import likeImg from "../../../assets/img/likeImg.png";
+import CreateAlbumModal from "../../UserModals/CreateAlbumModal";
+import EditAlbumModal from "../../UserModals/EditAlbumModal";
 
-// ── Временные заглушки для изображений ──────────────────────────────────────
-// Замени на реальные импорты когда подключишь assets:
-//   import favoriteCover from "../../../assets/img/collection_favorites.png";
-//   и т.д.
 const PLACEHOLDER_GRADIENT = [
   "linear-gradient(135deg, #a78bfa 0%, #7c3aed 100%)",
   "linear-gradient(135deg, #f9a8d4 0%, #ec4899 100%)",
@@ -43,7 +40,6 @@ const ALBUMS: Album[] = [
   },
 ];
 
-// Иконка редактирования (inline SVG, без внешних зависимостей)
 function EditIcon() {
   return (
     <svg
@@ -63,7 +59,6 @@ function EditIcon() {
   );
 }
 
-// Иконка поиска
 function SearchIcon() {
   return (
     <svg
@@ -82,6 +77,8 @@ function Tracks() {
   const searchId = useId();
   const [searchValue, setSearchValue] = useState("");
   const [sortBy, setSortBy] = useState<SortOption>("alphabet");
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [editingAlbum, setEditingAlbum] = useState<Album | null>(null);
 
   const filteredAlbums = useMemo(() => {
     const q = searchValue.trim().toLowerCase();
@@ -98,6 +95,7 @@ function Tracks() {
   }, [searchValue, sortBy]);
 
   return (
+    <>
     <div className={tracksClasses.tracks}>
 
       {/* ── Быстрые коллекции ── */}
@@ -113,7 +111,19 @@ function Tracks() {
             </h2>
             <p className={tracksClasses.collection__count}>23 композиции</p>
           </div>
-            <img src={likeImg} className={tracksClasses.collection__image} alt="" />
+          {/*
+            Заменить src на реальное изображение:
+            <img src={favoriteCover} ... />
+          */}
+          <div
+            style={{
+              width: 174,
+              height: "100%",
+              background: "linear-gradient(135deg, #fda4af 0%, #f43f5e 100%)",
+              borderRadius: "0 20px 20px 0",
+            }}
+            aria-hidden="true"
+          />
         </article>
 
         {/* Мои записи */}
@@ -221,6 +231,7 @@ function Tracks() {
                   type="button"
                   className={tracksClasses.album__edit__btn}
                   aria-label={`Редактировать альбом ${album.title}`}
+                  onClick={() => setEditingAlbum(album)}
                 >
                   <EditIcon />
                   Редактировать
@@ -239,6 +250,7 @@ function Tracks() {
               type="button"
               className={tracksClasses.album__create}
               aria-label="Создать альбом"
+              onClick={() => setShowCreateModal(true)}
             >
               <span className={tracksClasses.album__create__plus} aria-hidden="true" />
               Создать альбом
@@ -247,6 +259,30 @@ function Tracks() {
         </div>
       </section>
     </div>
+
+      {/* ── Модальные окна ── */}
+      {showCreateModal && (
+        <CreateAlbumModal
+          onClose={() => setShowCreateModal(false)}
+          onCreated={(name, cover) => {
+            console.log("Создан альбом:", name, cover);
+          }}
+        />
+      )}
+      {editingAlbum && (
+        <EditAlbumModal
+          albumTitle={editingAlbum.title}
+          albumCover={null}
+          onClose={() => setEditingAlbum(null)}
+          onSaved={(name, cover) => {
+            console.log("Сохранён альбом:", name, cover);
+          }}
+          onDeleted={() => {
+            console.log("Удалён альбом:", editingAlbum.id);
+          }}
+        />
+      )}
+    </>
   );
 }
 

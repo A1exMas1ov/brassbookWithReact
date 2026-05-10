@@ -1,4 +1,3 @@
-// components/Sidebar/Sidebar.tsx
 import { NavLink } from "react-router-dom";
 import layoutClasses from "../styles/layout.module.css";
 import sidebarClasses from "../styles/sidebar.module.css";
@@ -32,7 +31,14 @@ function Sidebar() {
               </NavLink>
               <a href=""><IconTracks /> Произведения</a>
               <a href=""><IconLibrary /> Библиотека</a>
-              <a href=""><IconPublications /> Публикации</a>
+              <NavLink
+                to="/publications"
+                className={({ isActive }) =>
+                  isActive ? sidebarClasses.activeLink : undefined
+                }
+              >
+                <IconPublications /> Публикации
+              </NavLink>
             </ul>
           </div>
 

@@ -1,0 +1,317 @@
+/* modal.module.css — общий оверлей и контейнер для всех модалок */
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(35, 11, 63, 0.4);
+  backdrop-filter: blur(2px);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  box-sizing: border-box;
+  animation: fadeIn 0.18s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.modal {
+  background: #ffffff;
+  border-radius: 28px;
+  padding: 20px;
+  width: 100%;
+  max-width: 480px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-shadow: 0 20px 60px rgba(35, 11, 63, 0.18);
+  animation: slideUp 0.22s ease;
+  box-sizing: border-box;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* ── Шапка модалки ── */
+.modal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.modal__title {
+  font-family: var(--main-font);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--font-color);
+  margin: 0;
+  letter-spacing: -0.44px;
+}
+
+.modal__close {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: none;
+  cursor: pointer;
+  border-radius: 8px;
+  color: var(--font-color-muted);
+  transition: background-color 0.15s, color 0.15s;
+  flex-shrink: 0;
+}
+
+.modal__close:hover {
+  background: var(--color-bg);
+  color: var(--font-color);
+}
+
+/* ── Поле ввода ── */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.field__label {
+  font-family: var(--main-font);
+  font-size: 18px;
+  font-weight: 700;
+  color: rgba(83, 64, 104, 1);
+  padding-left: 16px;
+  letter-spacing: -0.36px;
+}
+
+.field__input {
+  width: 100%;
+  height: 69px;
+  background: #f4f3f5;
+  border-radius: 20px;
+  border: none;
+  padding: 0 36px;
+  font-family: var(--main-font);
+  font-size: 22px;
+  font-weight: 400;
+  color: var(--font-color);
+  box-sizing: border-box;
+  outline: none;
+  transition: box-shadow 0.15s;
+}
+
+.field__input:focus {
+  box-shadow: 0 0 0 2px var(--color-accent);
+}
+
+.field__input::placeholder {
+  color: rgba(35, 11, 63, 0.3);
+}
+
+/* ── Загрузка обложки ── */
+.cover__btn {
+  width: 100%;
+  height: 120px;
+  background: var(--color-bg);
+  border-radius: 16px;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  overflow: hidden;
+  position: relative;
+  transition: box-shadow 0.15s;
+}
+
+.cover__btn:hover {
+  box-shadow: 0 0 0 2px var(--color-accent);
+}
+
+.cover__btn--has-image {
+  background-size: cover;
+  background-position: center;
+}
+
+.cover__btn__overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.22);
+}
+
+.cover__btn__content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.cover__btn__icon {
+  width: 40px;
+  height: 40px;
+}
+
+.cover__btn__text {
+  font-family: var(--main-font);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--font-color-muted);
+  letter-spacing: -0.26px;
+}
+
+.cover__btn--has-image .cover__btn__text {
+  color: #ffffff;
+}
+
+/* ── Кнопки действий ── */
+.btn__primary {
+  width: 100%;
+  height: 44px;
+  border-radius: 60px;
+  border: none;
+  cursor: pointer;
+  background: linear-gradient(180deg, #9260ff 0%, #6b27ff 100%);
+  color: #ffffff;
+  font-family: var(--main-font);
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: -0.14px;
+  transition: opacity 0.15s;
+}
+
+.btn__primary:hover { opacity: 0.88; }
+.btn__primary:disabled { opacity: 0.45; cursor: default; }
+
+.btn__danger {
+  flex: 1;
+  height: 44px;
+  border-radius: 60px;
+  border: none;
+  cursor: pointer;
+  background: var(--color-bg);
+  color: #db422b;
+  font-family: var(--main-font);
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: -0.14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: background-color 0.15s;
+}
+
+.btn__danger:hover { background: #fde8e5; }
+
+.btn__row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.btn__row .btn__primary {
+  flex: 1;
+  width: auto;
+}
+
+/* ── Табы (редактирование данных) ── */
+.tabs {
+  display: flex;
+  align-items: flex-end;
+  gap: 32px;
+  border-bottom: 2px solid var(--color-bg);
+  margin-bottom: 4px;
+}
+
+.tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0 0 0 0;
+}
+
+.tab__label {
+  font-family: var(--main-font);
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.3px;
+  color: rgba(25, 6, 54, 0.4);
+  white-space: nowrap;
+}
+
+.tab--active .tab__label {
+  color: var(--color-accent);
+  font-weight: 800;
+}
+
+.tab__indicator {
+  width: 100%;
+  height: 6px;
+  background: var(--color-accent);
+  border-radius: 20px 20px 0 0;
+  margin-bottom: -2px;
+}
+
+/* ── Форма редактирования данных ── */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.form__row {
+  display: flex;
+  gap: 12px;
+}
+
+.form__row .field {
+  flex: 1;
+}
+
+.field__input--small {
+  font-size: 18px;
+  height: 60px;
+  padding: 0 24px;
+}
+
+.forgot__password {
+  display: flex;
+  justify-content: center; 
+  gap: 8px;
+  align-items: center;
+  font-family: var(--main-font);
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--font-color-muted);
+  letter-spacing: -0.28px;
+}
+
+.forgot__passwordLink {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--font-color-muted);
+  text-decoration: underline;
+  transition: color 0.15s;
+}
+
+.forgot__passwordLink:hover {
+  color: var(--color-accent);
+}

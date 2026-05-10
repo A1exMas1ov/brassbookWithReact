@@ -1,9 +1,5 @@
-// components/Dictaphone/Dictaphone.tsx
 import classes from "../styles/dictaphone.module.css";
 import dictaphoneImg from "../../../assets/img/dictaphoneImg.png";
-
-// Замени на реальный импорт когда подключишь assets:
-// import dictaphoneImg from "../../../assets/img/dictaphone.png";
 
 function Dictaphone() {
   return (

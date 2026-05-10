@@ -34,7 +34,7 @@
 /* ── Info ── */
 .card__info {
   flex: 1;
-  min-width: 0;          /* позволяет flex-item сжиматься ниже content-size */
+  min-width: 0;
   height: 350px;
   display: flex;
   flex-direction: column;
@@ -44,30 +44,24 @@
 }
 
 .card__info__main {
-  /* убираем фиксированную высоту — пусть тянется по содержимому */
   flex: 1;
   min-height: 0;
   width: 100%;
   display: flex;
   flex-direction: column;
   gap: 32px;
-  overflow: hidden;      /* не вылезаем за границы карточки */
+  overflow: hidden;
 }
 
 .card__info__name {
   width: 100%;
-  /* фиксированная высота убрана: имя может занимать сколько нужно */
-  display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
 .card__info__extra {
-  /* min-width убран — теперь блок просто занимает 100% доступной ширины,
-     не вылезая за пределы .card__info при узком экране */
   width: 100%;
   max-width: 381px;
-  /* высота auto вместо фиксированных 82px: если текст переносится — блок растянется */
   min-height: 82px;
   display: flex;
   flex-direction: column;
@@ -82,14 +76,13 @@
 
 /* ── Кнопки ── */
 .card__buttons {
-  /* min-width убран — кнопки с white-space:nowrap сами задают свою ширину */
   width: 100%;
   max-width: 201px;
   display: flex;
   flex-direction: column;
   gap: 8px;
   align-items: flex-start;
-  flex-shrink: 0;        /* не сжимать кнопки — они внизу карточки */
+  flex-shrink: 0;
 }
 
 .button__edit__data {
@@ -175,6 +168,12 @@
 .extra__text--accent {
   color: var(--color-accent);
   font-weight: 600;
+  font-style: normal;
+}
+
+.extra__text--default {
+  color: rgba(35, 11, 63, 0.8);
+  font-weight: 600;
   font-style: italic;
 }
 
@@ -187,12 +186,44 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
 }
 
-.extra__icon--heart::before {
-  content: "♥";
-  font-size: 11px;
-  color: #f70a51;
+.extra__icon svg {
+  display: block;
+}
+
+.extra__icon__dictaphone__wrapper {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  background: rgba(247, 10, 81, 0.1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
+  margin: 0 2px;
+  vertical-align: middle;
+}
+
+.extra__icon__dictaphone__img {
+  width: 120%;
+  height: 120%;
+  object-fit: cover;
+  object-position: -23px center;
+  position: absolute;
+  inset: 0;
+}
+
+.extra__icon__dictaphone__overlay {
+  position: absolute;
+  inset: 0;
+  background: var(--color-accent);
+  mix-blend-mode: color;
+  pointer-events: none;
 }
 
 /* ── Адаптив ── */

@@ -1,4 +1,3 @@
-// components/MusicPlayer/MusicPlayer.tsx
 import { useEffect, useState, useId, useRef, useCallback } from "react";
 import * as Tone from "tone";
 import bethoven_menuet from "/src/assets/music/bethoven_menuet.mp3";
@@ -59,242 +58,177 @@ function formatTime(s: number) {
   return `${m}:${sec}`;
 }
 
-// playbackRate меняет питч пропорционально скорости.
-// Компенсируем это: pitchCompensation = -12 * log2(rate)
-// чтобы итоговая тональность = только то, что выбрал пользователь.
-function rateToPitchCompensation(tempoOffset: number): number {
-  const rate = Math.max(0.5, 1 + tempoOffset);
-  return -12 * Math.log2(rate);
-}
-
 function MusicPlayer() {
   const progressId = useId();
-  const playIdRef = useRef(0);
 
-  const playerRef  = useRef<Tone.Player | null>(null);
-  const shifterRef = useRef<Tone.PitchShift | null>(null);
-  const isSeekingRef = useRef(false);
+  const audioCtxRef    = useRef<AudioContext | null>(null);
+  const audioBufferRef = useRef<AudioBuffer | null>(null);
+  const sourceRef      = useRef<AudioBufferSourceNode | null>(null);
+  const pitchShiftRef  = useRef<Tone.PitchShift | null>(null);
 
-  // Ref-версии живого состояния — нужны для колбэков Tone.js,
-  // которые захватывают значения на момент создания и не обновляются через closure.
-  const isPlayingRef   = useRef(false);
-  const progressRef    = useRef(0);
-  const startTimeRef   = useRef(0);
-  const pauseOffsetRef = useRef(0);
-  const tempoRef       = useRef(0);
-  const isDraggingRef        = useRef(false);  // true пока пользователь держит ползунок
-  const seekValueRef         = useRef(0);      // значение куда перетащили
-  const wasPlayingBeforeSeek = useRef(false);  // играло ли до начала drag
+  const offsetAtStartRef = useRef(0);
+  const ctxTimeAtStartRef = useRef(0);
+  const rateRef     = useRef(1);
+  const tonalityRef = useRef(0);
 
-  const [isPlaying,      setIsPlaying]      = useState(false);
-  const [progress,       setProgress]       = useState(0);
-  const [totalDuration,  setTotalDuration]  = useState(0);
-  const [tonality,       setTonality]       = useState(0);
-  const [tempo,          setTempo]          = useState(0);
+  const [isPlaying,       setIsPlaying]     = useState(false);
+  const [progress,        setProgress]      = useState(0);
+  const [totalDuration,   setTotalDuration] = useState(0);
+  const [tonality,        setTonality]      = useState(0);
+  const [tempo,           setTempo]         = useState(0);
   const [selectedVersion, setVersion]       = useState<VersionId>("brassbook");
-  const [rating,         setRating]         = useState(0);
-  const [hoverRating,    setHoverRating]    = useState(0);
+  const [rating,          setRating]        = useState(0);
+  const [hoverRating,     setHoverRating]   = useState(0);
+  const [isLoaded,        setIsLoaded]      = useState(false);
 
-  // Синхронизируем tempoRef с state
-  useEffect(() => { tempoRef.current = tempo; }, [tempo]);
-
-  
-  // ── Init ────────────────────────────────────────────────────────────────
   useEffect(() => {
+    const toneCtx = Tone.getContext();
+    const ctx = toneCtx.rawContext as AudioContext;
+    audioCtxRef.current = ctx;
+
     const shifter = new Tone.PitchShift({ pitch: 0 }).toDestination();
+    pitchShiftRef.current = shifter;
 
-    const player = new Tone.Player({
-      url: bethoven_menuet,
-      autostart: false,
-      loop: false,
-      onstop: () => {
-        // ❗ игнорируем stop при seek
-        if (isSeekingRef.current) return;
+    fetch(bethoven_menuet)
+      .then(r => r.arrayBuffer())
+      .then(ab => ctx.decodeAudioData(ab))
+      .then(buffer => {
+        audioBufferRef.current = buffer;
+        setTotalDuration(buffer.duration);
+        setIsLoaded(true);
+      })
+      .catch(console.error);
 
-        // ❗ игнорируем stop при паузе
-        if (!isPlayingRef.current) return;
-
-        // ✅ реально конец трека
-        isPlayingRef.current = false;
-        pauseOffsetRef.current = 0;
-        progressRef.current = 0;
-
-        setIsPlaying(false);
-        setProgress(0);
-      },
-      onload: () => {
-        if (player.buffer) setTotalDuration(player.buffer.duration);
-      },
-    }).connect(shifter);
-
-    playerRef.current  = player;
-    shifterRef.current = shifter;
-
-    return () => { player.dispose(); shifter.dispose(); };
+    return () => {
+      try { sourceRef.current?.stop(); } catch {}
+      sourceRef.current?.disconnect();
+      shifter.dispose();
+    };
   }, []);
 
-  // ── Питч = тональность пользователя + компенсация от темпа ─────────────
-  useEffect(() => {
-    if (!shifterRef.current) return;
-    shifterRef.current.pitch = tonality + rateToPitchCompensation(tempo);
-  }, [tonality, tempo]);
+  const startSource = useCallback((offsetSeconds: number) => {
+    const ctx    = audioCtxRef.current;
+    const buffer = audioBufferRef.current;
+    const shift  = pitchShiftRef.current;
+    if (!ctx || !buffer || !shift) return;
 
-  // ── Темп = только скорость, питч компенсируется выше ────────────────────
-  useEffect(() => {
-    if (!playerRef.current) return;
-    playerRef.current.playbackRate = Math.max(0.5, 1 + tempo);
-  }, [tempo]);
+    try {
+      sourceRef.current?.stop();
+      sourceRef.current?.disconnect();
+    } catch {}
 
-  // ── Тик прогресс-бара ───────────────────────────────────────────────────
+    const source = ctx.createBufferSource();
+    source.buffer = buffer;
+    source.playbackRate.value = rateRef.current;
+
+    const shiftNativeInput = (shift.input as any).input as AudioNode;
+    source.connect(shiftNativeInput);
+
+    const clampedOffset = Math.max(0, Math.min(buffer.duration, offsetSeconds));
+    source.start(0, clampedOffset);
+
+    offsetAtStartRef.current  = clampedOffset;
+    ctxTimeAtStartRef.current = ctx.currentTime;
+
+    source.onended = () => {
+      const elapsed = (ctx.currentTime - ctxTimeAtStartRef.current) * rateRef.current;
+      if (offsetAtStartRef.current + elapsed >= buffer.duration - 0.2) {
+        setIsPlaying(false);
+        setProgress(0);
+        offsetAtStartRef.current = 0;
+      }
+    };
+
+    sourceRef.current = source;
+  }, []);
+
   useEffect(() => {
     if (!isPlaying) return;
     const id = setInterval(() => {
-      if (isDraggingRef.current) return; // не двигаем ползунок во время drag
-      const rate    = Math.max(0.5, 1 + tempoRef.current);
-      const elapsed = (Tone.now() - startTimeRef.current) * rate;
-      const clamped = Math.min(elapsed, totalDuration);
-      progressRef.current = clamped;
+      const ctx = audioCtxRef.current;
+      if (!ctx) return;
+      const elapsed = (ctx.currentTime - ctxTimeAtStartRef.current) * rateRef.current;
+      const pos = offsetAtStartRef.current + elapsed;
+      const clamped = Math.min(pos, totalDuration);
       setProgress(clamped);
-    }, 100);
+    }, 200);
     return () => clearInterval(id);
   }, [isPlaying, totalDuration]);
 
-  // ── Play / Pause ─────────────────────────────────────────────────────────
- const togglePlayPause = useCallback(async () => {
-  await Tone.start();
-  const player = playerRef.current;
-  if (!player || !player.loaded) return;
-
-  if (isPlayingRef.current) {
-    // 👉 PAUSE
-    isPlayingRef.current   = false;
-    pauseOffsetRef.current = progressRef.current;
-
-    playIdRef.current += 1; // ❗ инвалидируем текущий play
-    player.stop();
-
-    setIsPlaying(false);
-  } else {
-    // 👉 PLAY / RESUME
-    const offset =
-      pauseOffsetRef.current >= totalDuration && totalDuration > 0
-        ? 0
-        : pauseOffsetRef.current;
-
-    const rate = Math.max(0.5, 1 + tempoRef.current);
-
-    startTimeRef.current   = Tone.now() - offset / rate;
-    pauseOffsetRef.current = offset;
-    progressRef.current    = offset;
-
-    isPlayingRef.current = true;
-
-    const id = ++playIdRef.current; // ❗ новый playId
-    player.start(Tone.now(), offset);
-
-    setProgress(offset);
-    setIsPlaying(true);
-  }
-}, [totalDuration]);
-  // ── Seek: три фазы — drag start / drag move / drag end ──────────────────
-
-  // Начало перетаскивания: останавливаем плеер, запоминаем что тащим
-    const handleSeekStart = useCallback(() => {
-      const player = playerRef.current;
-
-      isDraggingRef.current = true;
-      isSeekingRef.current = true; // ← ВАЖНО СТАВИТЬ РАНЬШЕ ВСЕГО
-
-      if (isPlayingRef.current && player) {
-        isPlayingRef.current = false;
-
-        playIdRef.current += 1;
-
-        player.stop();
-      }
-    }, []);
-
-  // Движение ползунка: только обновляем визуал, плеер не трогаем
-  const handleSeekChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const val = Number(e.target.value);
-
-    seekValueRef.current = val;
-    progressRef.current  = val;
-    setProgress(val);
-
-    const player = playerRef.current;
-    if (!player || !player.loaded) return;
-
-    // 👉 ЕСЛИ ЭТО НЕ DRAG — значит это клик
-    if (!isDraggingRef.current) {
-      const rate = Math.max(0.5, 1 + tempoRef.current);
-
-      pauseOffsetRef.current = val;
-      startTimeRef.current   = Tone.now() - val / rate;
-
-      if (isPlayingRef.current) {
-        playIdRef.current += 1;
-        player.stop();
-        player.start(Tone.now(), val);
-      }
+  useEffect(() => {
+    tonalityRef.current = tonality;
+    if (pitchShiftRef.current) {
+      const compensation = -12 * Math.log2(rateRef.current);
+      pitchShiftRef.current.pitch = tonality + compensation;
     }
-  }, []);
+  }, [tonality]);
 
-  // Отпустили ползунок: применяем позицию и возобновляем если играло
-  const handleSeekEnd = useCallback((wasPlaying: boolean) => {
-    if (!isDraggingRef.current) return;
+  useEffect(() => {
+    const rate = Math.max(0.5, Math.min(4, 1 + tempo));
 
-    isDraggingRef.current = false;
-    isSeekingRef.current = false; // 👈 ДОБАВИТЬ
+    const ctx = audioCtxRef.current;
+    if (ctx && sourceRef.current) {
+      const oldElapsed = (ctx.currentTime - ctxTimeAtStartRef.current) * rateRef.current;
+      offsetAtStartRef.current  = offsetAtStartRef.current + oldElapsed;
+      ctxTimeAtStartRef.current = ctx.currentTime;
+    }
 
-    const player = playerRef.current;
-    if (!player || !player.loaded) return;
+    rateRef.current = rate;
 
-    const newTime = seekValueRef.current;
-    const rate    = Math.max(0.5, 1 + tempoRef.current);
+    if (sourceRef.current) {
+      sourceRef.current.playbackRate.value = rate;
+    }
 
-    pauseOffsetRef.current = newTime;
-    progressRef.current    = newTime;
-    startTimeRef.current   = Tone.now() - newTime / rate;
+    if (pitchShiftRef.current) {
+      const compensation = -12 * Math.log2(rate);
+      pitchShiftRef.current.pitch = tonalityRef.current + compensation;
+    }
+  }, [tempo]);
 
-    if (wasPlaying) {
-      isPlayingRef.current = true;
+  const togglePlayPause = useCallback(async () => {
+    await Tone.start();
 
-      const id = ++playIdRef.current; // 👈 ДОБАВИТЬ
-      player.start(Tone.now(), newTime);
-
+    if (isPlaying) {
+      const ctx = audioCtxRef.current;
+      if (ctx) {
+        const elapsed = (ctx.currentTime - ctxTimeAtStartRef.current) * rateRef.current;
+        offsetAtStartRef.current = offsetAtStartRef.current + elapsed;
+      }
+      try {
+        sourceRef.current?.stop();
+        sourceRef.current?.disconnect();
+      } catch {}
+      sourceRef.current = null;
+      setIsPlaying(false);
+    } else {
+      startSource(offsetAtStartRef.current);
       setIsPlaying(true);
     }
-  }, []);
-  useEffect(() => {
-  const stop = () => {
-    if (isDraggingRef.current) {
-      handleSeekEnd(wasPlayingBeforeSeek.current);
+  }, [isPlaying, startSource]);
+
+  const handleSeek = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const newTime = Number(e.target.value);
+    offsetAtStartRef.current = newTime;
+    setProgress(newTime);
+
+    if (isPlaying) {
+      startSource(newTime);
     }
-  };
-
-  window.addEventListener("mouseup", stop);
-  window.addEventListener("touchend", stop);
-
-  return () => {
-    window.removeEventListener("mouseup", stop);
-    window.removeEventListener("touchend", stop);
-  };
-}, [handleSeekEnd]);
+  }, [isPlaying, startSource]);
 
   const pct = totalDuration
     ? Math.max(0, Math.min(100, (progress / totalDuration) * 100))
     : 0;
 
-  const decTonality = useCallback(() => setTonality(v => Math.max(-6,  +(v - 0.5).toFixed(1))), []);
-  const incTonality = useCallback(() => setTonality(v => Math.min( 6,  +(v + 0.5).toFixed(1))), []);
+  const decTonality = useCallback(() => setTonality(v => Math.max(-6, +(v - 0.5).toFixed(1))), []);
+  const incTonality = useCallback(() => setTonality(v => Math.min( 6, +(v + 0.5).toFixed(1))), []);
+
   const decTempo    = useCallback(() => setTempo   (v => Math.max(-0.5, +(v - 0.1).toFixed(1))), []);
-  const incTempo    = useCallback(() => setTempo   (v => Math.min( 1,  +(v + 0.1).toFixed(1))), []);
+  const incTempo    = useCallback(() => setTempo   (v => Math.min( 1,   +(v + 0.1).toFixed(1))), []);
 
   return (
     <div className={playerClasses.player}>
 
-      {/* Шапка */}
       <div className={playerClasses.player__header}>
         <div className={playerClasses.player__cover}>
           <div style={{ width: "100%", height: "100%", background: "linear-gradient(135deg, #a78bfa, #6d28d9)" }} aria-hidden="true" />
@@ -309,38 +243,21 @@ function MusicPlayer() {
         </div>
       </div>
 
-      {/* Прогресс */}
       <div className={playerClasses.player__progress__wrap}>
         <div className={playerClasses.player__progress__track}>
           <div className={playerClasses.player__progress__fill} style={{ width: `${pct}%` }} />
           <div className={playerClasses.player__progress__thumb} style={{ left: `${pct}%` }} />
-        <input
-          id={progressId}
-          type="range"
-          min={0}
-          max={totalDuration || 1}
-          step={0.1}
-          value={progress}
-
-          onMouseDown={() => {
-            seekValueRef.current = progress;
-            wasPlayingBeforeSeek.current = isPlayingRef.current;
-            handleSeekStart();
-          }}
-
-          onTouchStart={() => {
-            seekValueRef.current = progress;
-            wasPlayingBeforeSeek.current = isPlayingRef.current;
-            handleSeekStart();
-          }}
-
-          onChange={handleSeekChange}
-
-          onMouseUp={() => handleSeekEnd(wasPlayingBeforeSeek.current)}
-          onTouchEnd={() => handleSeekEnd(wasPlayingBeforeSeek.current)}
-
-          className={playerClasses.player__progress__input}
-        />
+          <input
+            id={progressId}
+            type="range"
+            min={0}
+            max={totalDuration || 1}
+            step={0.1}
+            value={progress}
+            onChange={handleSeek}
+            className={playerClasses.player__progress__input}
+            aria-valuetext={`${formatTime(progress)} из ${formatTime(totalDuration)}`}
+          />
         </div>
         <div className={playerClasses.player__progress__times}>
           <span className={playerClasses.player__time}>{formatTime(progress)}</span>
@@ -348,7 +265,6 @@ function MusicPlayer() {
         </div>
       </div>
 
-      {/* Кнопки управления */}
       <div className={playerClasses.player__controls} aria-label="Управление воспроизведением">
         <button type="button" className={playerClasses.control__btn} aria-label="Предыдущий трек">
           <span className={playerClasses.control__icon}>⏮</span>
@@ -357,6 +273,7 @@ function MusicPlayer() {
           type="button"
           className={`${playerClasses.control__btn} ${playerClasses["control__btn--play"]}`}
           onClick={togglePlayPause}
+          disabled={!isLoaded}
           aria-label={isPlaying ? "Пауза" : "Воспроизвести"}
         >
           {isPlaying ? <PauseIcon /> : <PlayIcon />}
@@ -366,7 +283,6 @@ function MusicPlayer() {
         </button>
       </div>
 
-      {/* Тональность / Темп */}
       <div className={playerClasses.player__settings}>
         <div className={playerClasses.player__setting__row}>
           <span className={playerClasses.player__setting__label}><IconTone /> Тональность</span>
@@ -386,12 +302,10 @@ function MusicPlayer() {
         </div>
       </div>
 
-      {/* Скачать */}
       <button type="button" className={playerClasses.player__download} aria-label="Скачать композицию">
         <span className={playerClasses.player__download__label}><IconDownload /> Скачать композицию</span>
       </button>
 
-      {/* Версии */}
       <div>
         <p className={playerClasses.player__versions__label}>Выбери версию произведения:</p>
         <div className={playerClasses.player__versions} role="radiogroup" aria-label="Версии произведения">
@@ -418,7 +332,6 @@ function MusicPlayer() {
         </div>
       </div>
 
-      {/* Оценка */}
       <div className={playerClasses.player__rating}>
         <p className={playerClasses.player__rating__label}>Оцени это произведение!</p>
         <div className={playerClasses.player__rating__stars} role="group" aria-label="Оценка произведения">
@@ -439,6 +352,5 @@ function MusicPlayer() {
     </div>
   );
 }
-
 
 export default MusicPlayer;
