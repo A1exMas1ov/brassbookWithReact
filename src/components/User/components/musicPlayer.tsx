@@ -5,42 +5,84 @@ import playerClasses from "../styles/musicPlayer.module.css";
 
 function IconDownload() {
   return (
-    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
-      <path d="M9 2v9m0 0-3-3m3 3 3-3M3 14h12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M14 7.5H10.625V11.2L12.35 9.475C12.475 9.35 12.6333 9.29167 12.7917 9.29167C12.95 9.29167 13.1083 9.35 13.2333 9.475C13.475 9.71667 13.475 10.1167 13.2333 10.3583L10.4417 13.15C10.2 13.3917 9.79999 13.3917 9.55832 13.15L6.76666 10.3583C6.52499 10.1167 6.52499 9.71667 6.76666 9.475C7.00832 9.23333 7.40832 9.23333 7.64999 9.475L9.37499 11.2V7.5H5.99999C3.33332 7.5 1.66666 9.16667 1.66666 11.8333V13.9917C1.66666 16.6667 3.33332 18.3333 5.99999 18.3333H13.9917C16.6583 18.3333 18.325 16.6667 18.325 14V11.8333C18.3333 9.16667 16.6667 7.5 14 7.5Z" fill="#6B27FF"/>
+      <path d="M10.625 2.29166C10.625 1.95 10.3417 1.66666 10 1.66666C9.65833 1.66666 9.375 1.95 9.375 2.29166V7.5H10.625V2.29166Z" fill="#6B27FF"/>
     </svg>
   );
 }
 function IconTone() {
   return (
-    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
-      <path d="M9 3v12M5 7l4-4 4 4M5 11l4 4 4-4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M18.3333 6.50834V10.4167H14.9333C14.8333 10.4083 14.6167 10.2833 14.5667 10.1917L13.7 8.55C13.3583 7.90001 12.7667 7.53334 12.1333 7.56667C11.5 7.6 10.9583 8.025 10.6833 8.71667L9.53332 11.6L9.36666 11.1667C8.95832 10.1083 7.79166 9.30834 6.64166 9.30834L1.66666 9.33334V6.50834C1.66666 3.475 3.47499 1.66667 6.50832 1.66667H13.4917C16.525 1.66667 18.3333 3.475 18.3333 6.50834Z" fill="#230B3F"/>
+      <path d="M18.3333 13.4917V11.6667H14.9333C14.375 11.6667 13.7167 11.2667 13.4583 10.775L12.5917 9.13334C12.3583 8.69167 12.025 8.71667 11.8417 9.175L9.92499 14.0167C9.71666 14.5583 9.36666 14.5583 9.14999 14.0167L8.19999 11.6167C7.97499 11.0333 7.27499 10.5583 6.64999 10.5583L1.66666 10.5833V13.4917C1.66666 16.475 3.41666 18.275 6.35832 18.325C6.44999 18.3333 6.54999 18.3333 6.64166 18.3333H13.3083C13.4333 18.3333 13.5583 18.3333 13.675 18.325C16.6 18.2583 18.3333 16.4667 18.3333 13.4917Z" fill="#230B3F"/>
+      <path d="M1.66666 10.5833V13.3417C1.65 13.075 1.64166 12.7917 1.64166 12.5V10.5833H1.66666Z" fill="#230B3F"/>
     </svg>
+
   );
 }
 function IconTempo() {
   return (
-    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
-      <rect x="2" y="12" width="2" height="4" rx="1" fill="currentColor"/>
-      <rect x="6" y="8" width="2" height="8" rx="1" fill="currentColor"/>
-      <rect x="10" y="5" width="2" height="11" rx="1" fill="currentColor"/>
-      <rect x="14" y="2" width="2" height="14" rx="1" fill="currentColor"/>
+    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+     <path fill-rule="evenodd" clip-rule="evenodd" d="M19 -1H-1V19H19V-1ZM3.55 9C3.55 5.99005 5.99005 3.55 9 3.55C12.01 3.55 14.45 5.99005 14.45 9C14.45 12.01 12.01 14.45 9 14.45C5.99005 14.45 3.55 12.01 3.55 9ZM9 2.45C5.38253 2.45 2.45 5.38253 2.45 9C2.45 12.6175 5.38253 15.55 9 15.55C12.6175 15.55 15.55 12.6175 15.55 9C15.55 5.38253 12.6175 2.45 9 2.45ZM5.35 9C5.35 6.98416 6.98416 5.35 9 5.35C9.30376 5.35 9.55 5.10376 9.55 4.8C9.55 4.49624 9.30376 4.25 9 4.25C6.37665 4.25 4.25 6.37665 4.25 9C4.25 9.30376 4.49624 9.55 4.8 9.55C5.10376 9.55 5.35 9.30376 5.35 9ZM12.0889 6.68891C12.3036 6.47412 12.3036 6.12588 12.0889 5.91109C11.8741 5.6963 11.5258 5.6963 11.311 5.91109L9.32543 7.89669C9.22225 7.86631 9.11303 7.85 9 7.85C8.36487 7.85 7.85 8.36487 7.85 9C7.85 9.63513 8.36487 10.15 9 10.15C9.63513 10.15 10.15 9.63513 10.15 9C10.15 8.88694 10.1337 8.77769 10.1033 8.67448L12.0889 6.68891Z" fill="#230B3F"/>
     </svg>
   );
 }
 function IconMinus() {
-  return <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M3 7h8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>;
+  return (
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M14.9333 6.81667H9.74164H5.06664C4.26664 6.81667 3.86664 7.78333 4.43331 8.35L8.74997 12.6667C9.44164 13.3583 10.5666 13.3583 11.2583 12.6667L12.9 11.025L15.575 8.35C16.1333 7.78333 15.7333 6.81667 14.9333 6.81667Z" fill="#230B3F"/>
+    </svg>
+  )
 }
 function IconPlus() {
-  return <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M7 3v8M3 7h8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>;
+  return (
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M15.5666 11.65L12.8916 8.97501L11.2583 7.33334C10.5666 6.64167 9.44164 6.64167 8.74998 7.33334L4.43331 11.65C3.86664 12.2167 4.27498 13.1833 5.06664 13.1833H9.74164H14.9333C15.7333 13.1833 16.1333 12.2167 15.5666 11.65Z" fill="#230B3F"/>
+    </svg>
+  )
 }
 function IconSound() {
-  return <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M2 6.5h2l3-3.5v12L4 11.5H2v-5Zm10 .5a3 3 0 0 1 0 4m2-6a6 6 0 0 1 0 8" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/></svg>;
+  return (
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M2.5 13.75C2.15833 13.75 1.875 13.4667 1.875 13.125V6.875C1.875 6.53333 2.15833 6.25 2.5 6.25C2.84167 6.25 3.125 6.53333 3.125 6.875V13.125C3.125 13.4667 2.84167 13.75 2.5 13.75Z" fill="#6B27FF"/>
+      <path d="M6.25 15.8333C5.90833 15.8333 5.625 15.55 5.625 15.2083V4.79167C5.625 4.45 5.90833 4.16667 6.25 4.16667C6.59167 4.16667 6.875 4.45 6.875 4.79167V15.2083C6.875 15.55 6.59167 15.8333 6.25 15.8333Z" fill="#6B27FF"/>
+      <path d="M10 17.9167C9.65833 17.9167 9.375 17.6333 9.375 17.2917V2.70833C9.375 2.36667 9.65833 2.08333 10 2.08333C10.3417 2.08333 10.625 2.36667 10.625 2.70833V17.2917C10.625 17.6333 10.3417 17.9167 10 17.9167Z" fill="#6B27FF"/>
+      <path d="M13.75 15.8333C13.4083 15.8333 13.125 15.55 13.125 15.2083V4.79167C13.125 4.45 13.4083 4.16667 13.75 4.16667C14.0917 4.16667 14.375 4.45 14.375 4.79167V15.2083C14.375 15.55 14.0917 15.8333 13.75 15.8333Z" fill="#6B27FF"/>
+      <path d="M17.5 13.75C17.1583 13.75 16.875 13.4667 16.875 13.125V6.875C16.875 6.53333 17.1583 6.25 17.5 6.25C17.8417 6.25 18.125 6.53333 18.125 6.875V13.125C18.125 13.4667 17.8417 13.75 17.5 13.75Z" fill="#6B27FF"/>
+    </svg>
+  )
 }
 function PlayIcon() {
-  return <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>;
+  return (
+    <svg width="27" height="31" viewBox="0 0 27 31" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M25.5 12.5308C27.5 13.6855 27.5 16.5722 25.5 17.7269L4.5 29.8513C2.5 31.006 -1.50515e-06 29.5626 -1.4042e-06 27.2532L-3.44255e-07 3.00448C-2.43308e-07 0.695075 2.5 -0.748303 4.5 0.406398L25.5 12.5308Z" fill="#230B3F"/>
+    </svg>
+  )
 }
 function PauseIcon() {
-  return <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>;
+  return (
+    <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M17.75 31.85V8.15C17.75 5.9 16.8 5 14.4 5H8.35C5.95 5 5 5.9 5 8.15V31.85C5 34.1 5.95 35 8.35 35H14.4C16.8 35 17.75 34.1 17.75 31.85Z" fill="#230B3F"/>
+      <path d="M35 31.85V8.15C35 5.9 34.05 5 31.65 5H25.6C23.2167 5 22.25 5.9 22.25 8.15V31.85C22.25 34.1 23.2 35 25.6 35H31.65C34.05 35 35 34.1 35 31.85Z" fill="#230B3F"/>
+    </svg>
+  )
+}
+function IconPrevTrack() {
+  return (
+    <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M25.6667 9.73V18.27C25.6667 20.02 23.765 21.1167 22.2483 20.2417L18.55 18.1067L14.8517 15.9717L14.28 15.645V12.355L14.8517 12.0283L18.55 9.89334L22.2483 7.75834C23.765 6.88334 25.6667 7.98 25.6667 9.73Z" fill="#230B3F"/>
+      <path d="M14.28 9.73V18.27C14.28 20.02 12.3783 21.1167 10.8733 20.2417L7.16333 18.1067L3.46499 15.9717C1.95999 15.0967 1.95999 12.9033 3.46499 12.0283L7.16333 9.89334L10.8733 7.75834C12.3783 6.88334 14.28 7.98 14.28 9.73Z" fill="#230B3F"/>
+    </svg>
+  );
+}
+function IconNextTrack() {
+  return (
+    <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ transform: "scaleX(-1)" }}>
+      <path d="M25.6667 9.73V18.27C25.6667 20.02 23.765 21.1167 22.2483 20.2417L18.55 18.1067L14.8517 15.9717L14.28 15.645V12.355L14.8517 12.0283L18.55 9.89334L22.2483 7.75834C23.765 6.88334 25.6667 7.98 25.6667 9.73Z" fill="#230B3F"/>
+      <path d="M14.28 9.73V18.27C14.28 20.02 12.3783 21.1167 10.8733 20.2417L7.16333 18.1067L3.46499 15.9717C1.95999 15.0967 1.95999 12.9033 3.46499 12.0283L7.16333 9.89334L10.8733 7.75834C12.3783 6.88334 14.28 7.98 14.28 9.73Z" fill="#230B3F"/>
+    </svg>
+  );
 }
 
 type VersionId = "original" | "brassbook" | "personal";
@@ -267,7 +309,7 @@ function MusicPlayer() {
 
       <div className={playerClasses.player__controls} aria-label="Управление воспроизведением">
         <button type="button" className={playerClasses.control__btn} aria-label="Предыдущий трек">
-          <span className={playerClasses.control__icon}>⏮</span>
+          <IconPrevTrack />
         </button>
         <button
           type="button"
@@ -279,7 +321,7 @@ function MusicPlayer() {
           {isPlaying ? <PauseIcon /> : <PlayIcon />}
         </button>
         <button type="button" className={playerClasses.control__btn} aria-label="Следующий трек">
-          <span className={playerClasses.control__icon}>⏭</span>
+          <IconNextTrack />
         </button>
       </div>
 
