@@ -1,4 +1,4 @@
-import { NavLink, useNavigate } from "react-router-dom"; 
+import { useNavigate } from "react-router-dom";
 import ImagePipe from "../UI/ImagePipe.tsx";
 import { useState, useEffect, useContext } from "react";
 import Button from "../button/Button.tsx";
@@ -9,11 +9,12 @@ import { FaExclamationCircle } from "react-icons/fa";
 function RestoreAuth() {
     const { store } = useContext(Context);
     const navigate = useNavigate();
-    
+
     const [code, setCode] = useState(['', '', '', '', '', '']);
     const [timeLeft, setTimeLeft] = useState(60);
     const [canResend, setCanResend] = useState(false);
-    const [errorCode, setErrorCode] = useState(false);
+    const [errorCode, setErrorCode] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
         if (timeLeft > 0) {
@@ -25,40 +26,57 @@ function RestoreAuth() {
     }, [timeLeft]);
 
     const handleChange = (index: number, value: string) => {
-        if (value.length > 1 || isNaN(Number(value))) return; 
-        
+        if (value.length > 1 || isNaN(Number(value))) return;
+
         const newCode = [...code];
         newCode[index] = value;
         setCode(newCode);
-        setErrorCode(false); // Убираем ошибку при новом вводе
+        setErrorCode('');
 
         if (value && index < 5) {
             const nextInput = document.getElementById(`code-${index + 1}`);
             nextInput?.focus();
         }
     };
+
     const handleKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === 'Backspace' && !code[index] && index > 0) {
-            // Переход на предыдущую клетку
             const prevInput = document.getElementById(`code-${index - 1}`);
             prevInput?.focus();
         }
     };
-    
 
-    const handleResend = () => {
-        setTimeLeft(60);
-        setCanResend(false);
-        setCode(['', '', '', '', '', '']); // Сбрасываем код при повторной отправке
+    const handleResend = async () => {
+        try {
+            if (store.restoreEmail) {
+                await store.checkEmailAndSendCode(store.restoreEmail);
+            }
+            setTimeLeft(60);
+            setCanResend(false);
+            setCode(['', '', '', '', '', '']);
+        } catch (e: unknown) {
+            const msg = e instanceof Error ? e.message : 'Ошибка при повторной отправке';
+            setErrorCode(msg);
+        }
     };
 
-    const handleVerify = () => {
+    const handleVerify = async () => {
         const fullCode = code.join('');
-    
-        if (fullCode === "123456") {
-            navigate('/restore?success=true'); 
-        } else {
-            setErrorCode(true);
+        if (fullCode.length < 6) {
+            setErrorCode('Введите все 6 цифр кода');
+            return;
+        }
+
+        setIsLoading(true);
+        try {
+            // Подтверждаем код (isConfirmed: true)
+            await store.confirmCode(store.restoreEmail);
+            navigate('/restore?success=true');
+        } catch (e: unknown) {
+            const msg = e instanceof Error ? e.message : 'Неверный или устаревший код';
+            setErrorCode(msg);
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -66,8 +84,8 @@ function RestoreAuth() {
         <div className="sign-in">
             <div className="sign-in__container container">
                 <div className="sign-in__info">
-                    <button 
-                        onClick={() => navigate(-1)} 
+                    <button
+                        onClick={() => navigate(-1)}
                         className="sign-in__backlink"
                         style={{ background: 'none', border: 'none', cursor: 'pointer' }}
                     >
@@ -77,22 +95,17 @@ function RestoreAuth() {
                         Вернуться назад
                     </button>
                     <h1 className={"sign-in__title"}>Восстановление пароля</h1>
-                    
+
                     <p className="sign-in__text">
-                        Проверьте указанную почту <b>{store.user.email}</b><br/>
+                        Проверьте указанную почту <b>{store.restoreEmail}</b><br/>
                         На неё должен прийти шестизначный код.
                     </p>
 
-                    {/* Логика текста/кнопки повтора */}
                     <p className="sign-in__backlink">
                         Не пришел код? {canResend ? (
-                            <span 
+                            <span
                                 onClick={handleResend}
-                                style={{ 
-                                    textDecoration: 'underline', 
-                                    cursor: 'pointer',
-                                    color: 'inherit' // Цвет как у текста вокруг
-                                }}
+                                style={{ textDecoration: 'underline', cursor: 'pointer', color: 'inherit' }}
                             >
                                 Отправить код повторно
                             </span>
@@ -104,12 +117,11 @@ function RestoreAuth() {
                     <div className={classes.div__input}>
                         {code.map((num, idx) => (
                             <label key={idx}>
-                                <input 
+                                <input
                                     id={`code-${idx}`}
-                                    type="text" 
-                                    maxLength={1} 
+                                    type="text"
+                                    maxLength={1}
                                     value={num}
-                                    
                                     onChange={(e) => handleChange(idx, e.target.value)}
                                     onKeyDown={(e) => handleKeyDown(idx, e)}
                                 />
@@ -117,26 +129,26 @@ function RestoreAuth() {
                         ))}
                     </div>
 
-                    {/* ОТОБРАЖЕНИЕ ОШИБКИ ПОД ИНПУТАМИ */}
                     {errorCode && (
                         <div className="errorUnder">
-                           {errorCode && <span className="errorUnder"> <FaExclamationCircle /> {errorCode}</span>}
-                           <span>Код неверный</span>
+                            <FaExclamationCircle />
+                            <span>{errorCode}</span>
                         </div>
                     )}
                 </div>
-                
-                <Button 
-                    isBtn={true} 
+
+                <Button
+                    isBtn={true}
                     className="button-type-2 sign-page-button"
                     onClick={handleVerify}
+                    disabled={isLoading}
                 >
-                    Продолжить
+                    {isLoading ? 'Проверяем...' : 'Продолжить'}
                 </Button>
                 <ImagePipe />
             </div>
         </div>
-    )
+    );
 }
 
 export default RestoreAuth;

@@ -1,16 +1,25 @@
 import { makeAutoObservable } from "mobx";
 import { IUser } from "../models/response/IUser";
 import AuthService from "../services/AuthService";
-import { AuthResponse } from "../models/response/AuthResponse";
+import { TokenResponse } from "../models/response/TokenResponse";
+import { RegistrationData } from "../models/RegistrationData";
 import axios from "axios";
-import { RegistrationData } from "../models/RegistrationData.ts";
 import { API_URL } from "../http";
+import { getErrorMessage } from "../utils/errorUtils";
 
 export default class Store {
     user = {} as IUser;
     isAuth = false;
     isLoading = false;
-     restoreEmail = '';
+
+    // Email для восстановления пароля (передаётся между страницами restore → restoreauth → restore?success)
+    restoreEmail = '';
+
+    // userId пользователя, которому меняем пароль (заполняется после подтверждения кода)
+    restoreUserId: number | null = null;
+
+    // Данные формы регистрации (хранятся между signup → signupauth)
+    pendingRegistration: (RegistrationData & { code: string }) | null = null;
 
     constructor() {
         makeAutoObservable(this);
@@ -28,128 +37,118 @@ export default class Store {
         this.isLoading = bool;
     }
 
+    // ── ВХОД ────────────────────────────────────────────────────────────
     async login(email: string, password: string) {
         try {
-            // ===== ЗАГЛУШКА (пока нет бэка) =====
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            
-            // Простая проверка для теста
-            // Можно войти с любыми данными, или только с конкретными
-            if (email && password) {
-                const mockToken = 'mock_token_' + Date.now();
-                localStorage.setItem('token', mockToken);
-                this.setAuth(true);
-                this.setUser({ 
-                    email: email, 
-                    id: 'mock_id_' + Date.now(), 
-                    isActivated: true 
-                } as IUser);
-                return;
-            }
-            
-            // const response = await AuthService.login(email, password);  // ВОТ ТУТ происходит сам "звонок" на бэк
-            // localStorage.setItem('token', response.data.access_token);
-            // this.setAuth(true);
-            // this.setUser(response.data.user);
-        } catch (e: any) {
-            console.error("Login error:", e.response?.data?.message);
-            throw e; // Пробрасываем ошибку в компонент
-        }
-    }
-
-    async registration(values: RegistrationData) {
-        try {
-            // Имитируем успешный ответ (добавляем все обязательные поля из IUser)
-            this.setUser({ 
-                email: values.email, 
-                id: 'mock-id', 
-                isActivated: false 
-            } as IUser); 
-
-            this.setAuth(true); 
-            return true;
-            // const response = await AuthService.registration(data);
-            // localStorage.setItem('token', response.data.access_token);
-            // this.setAuth(true);
-            // this.setUser(response.data.user);
-            // return response;
-        } catch (e: any) {
-            console.error("Registration error:", e.response?.data?.message);
-            throw e; // Чтобы форма могла показать ошибку пользователю
-        }
-    }
-
-    async checkAuth() {
-        this.setLoading(true);
-        try {
-            const response = await axios.get<AuthResponse>(`${API_URL}/refresh`, { 
-                withCredentials: true 
-            });
-            localStorage.setItem('token', response.data.access_token);
+            const response = await AuthService.login(email, password);
+            localStorage.setItem('token', response.data.accessToken);
+            localStorage.setItem('refreshToken', response.data.refreshToken);
             this.setAuth(true);
-            this.setUser(response.data.user);
-        } catch (e: any) {
-            console.log("User is not authorized (refresh failed)");
-        } finally {
-            this.setLoading(false);
+            // Бэк не возвращает user при логине — устанавливаем email вручную
+            this.setUser({ email, id: 0, isActivated: true } as IUser);
+        } catch (e: unknown) {
+            console.error("Login error:", getErrorMessage(e));
+            throw e;
         }
     }
 
-    async checkEmailAndSendCode(email: string) {
-        
-        // ===== ЗАГЛУШКА =====
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            
-            this.restoreEmail = email;
-            console.log(`Mock: Код для ${email} - 123456`);
-            alert(`Демо-режим: Ваш код подтверждения - 123456`);
+    // ── РЕГИСТРАЦИЯ ──────────────────────────────────────────────────────
+    // Шаг 1: отправить код на email (isConfirmed: false)
+    async sendCode(email: string) {
+        try {
+            await AuthService.sendCode(email, false);
             return true;
-        // ========== когда появится бэк) ==========
-        // const response = await AuthService.checkEmail(email);
-        // 
-        // if (!response.data.exists) {
-        //     throw new Error('Пользователь с таким email не найден');
-        // }
-        // 
-        // await AuthService.sendRestoreCode(email);
-        // this.restoreEmail = email;
-        // return true;
-        
-    }   
+        } catch (e: unknown) {
+            console.error("Send code error:", getErrorMessage(e));
+            throw e;
+        }
+    }
 
-    async resetPassword(newPassword: string, confirmPassword: string) {     
+    // Шаг 2: подтвердить код (isConfirmed: true)
+    async confirmCode(email: string) {
+        try {
+            await AuthService.sendCode(email, true);
+            return true;
+        } catch (e: unknown) {
+            console.error("Confirm code error:", getErrorMessage(e));
+            throw e;
+        }
+    }
+
+    // Шаг 3: создать пользователя с кодом
+    async registration(data: RegistrationData) {
+        try {
+            const response = await AuthService.registration(data);
+            this.setUser({
+                email: data.email,
+                id: response.data.id,
+                isActivated: false
+            } as IUser);
+            return response.data;
+        } catch (e: unknown) {
+            console.error("Registration error:", getErrorMessage(e));
+            throw e;
+        }
+    }
+
+    // ── ВОССТАНОВЛЕНИЕ ПАРОЛЯ ────────────────────────────────────────────
+    // Проверить email и отправить код
+    async checkEmailAndSendCode(email: string) {
         this.setLoading(true);
         try {
-            // ===== ЗАГЛУШКА =====
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            
-            console.log(`Mock: Пароль изменен для ${this.restoreEmail}`);
-            alert(`Демо-режим: Пароль успешно изменен!`);
-            
-            const savedEmail = this.restoreEmail;
-            this.restoreEmail = '';
+            await AuthService.sendCode(email, false);
+            this.restoreEmail = email;
             return true;
-            
-            // ===== РЕАЛЬНЫЙ КОД =====
-            // await AuthService.resetPassword(this.restoreEmail, newPassword);
-            // this.restoreEmail = '';
-            // return true;
-        } catch (e: any) {
-            console.error("Reset password error:", e.message);
+        } catch (e: unknown) {
+            console.error("Check email error:", getErrorMessage(e));
             throw e;
         } finally {
             this.setLoading(false);
         }
     }
 
-    async logout() {
+    // Сменить пароль (бэк: PUT /registration с { password, id })
+    async resetPassword(newPassword: string, userId: number) {
+        this.setLoading(true);
         try {
-            await AuthService.logout();
-            localStorage.removeItem('token');
-            this.setAuth(false);
-            this.setUser({} as IUser);
-        } catch (e: any) {
-            console.error(e.response?.data?.message);
+            await AuthService.updatePassword(newPassword, userId);
+            this.restoreEmail = '';
+            this.restoreUserId = null;
+            return true;
+        } catch (e: unknown) {
+            console.error("Reset password error:", getErrorMessage(e));
+            throw e;
+        } finally {
+            this.setLoading(false);
         }
+    }
+
+    // ── ПРОВЕРКА СЕССИИ ──────────────────────────────────────────────────
+    async checkAuth() {
+        this.setLoading(true);
+        try {
+            const refreshToken = localStorage.getItem('refreshToken');
+            const response = await axios.get<TokenResponse>(`${API_URL}/token/refresh`, {
+                headers: { Authorization: `Bearer ${refreshToken}` }
+            });
+            localStorage.setItem('token', response.data.accessToken);
+            localStorage.setItem('refreshToken', response.data.refreshToken);
+            this.setAuth(true);
+        } catch (e: unknown) {
+            console.log("User is not authorized (refresh failed)");
+            localStorage.removeItem('token');
+            localStorage.removeItem('refreshToken');
+        } finally {
+            this.setLoading(false);
+        }
+    }
+
+    // ── ВЫХОД ────────────────────────────────────────────────────────────
+    async logout() {
+        // На бэке нет эндпоинта logout — просто чистим локальное состояние
+        localStorage.removeItem('token');
+        localStorage.removeItem('refreshToken');
+        this.setAuth(false);
+        this.setUser({} as IUser);
     }
 }

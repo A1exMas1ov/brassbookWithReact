@@ -1,9 +1,5 @@
-import {IUser} from "./IUser";
+// Бэк при логине/регистрации НЕ возвращает user — только токены.
+// Используй TokenResponse напрямую в сервисах.
+// Этот файл оставлен для обратной совместимости, если где-то ещё используется AuthResponse.
 
-export interface AuthResponse{
-    access_token: string; // Токен доступа (живет недолго)
-    refresh_token: string; // Токен обновления (живет дольше)
-    user: IUser;  // Данные пользователя
-}
-
-//Описывает, что бэкенд возвращает после успешного логина/регистрации.
+export { TokenResponse as AuthResponse } from "./TokenResponse";
