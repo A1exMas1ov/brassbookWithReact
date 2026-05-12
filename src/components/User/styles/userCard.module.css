@@ -1,0 +1,243 @@
+/* userCard.module.css — Карточка пользователя */
+
+.card__content {
+  width: 100%;
+  height: 366px;
+  border-radius: var(--radius-card);
+  background: var(--color-surface);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0 10px;
+  box-sizing: border-box;
+  position: relative;
+  overflow: hidden;
+}
+
+.card__inner {
+  display: flex;
+  width: 100%;
+  height: 350px;
+  gap: 20px;
+}
+
+/* ── Фото ── */
+.card__photo {
+  width: 220px;
+  height: 350px;
+  border-radius: var(--radius-inner);
+  background-color: rgba(248, 248, 250, 1);
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+/* ── Info ── */
+.card__info {
+  flex: 1;
+  min-width: 0;
+  height: 350px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding-top: 16px;
+  box-sizing: border-box;
+}
+
+.card__info__main {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  overflow: hidden;
+}
+
+.card__info__name {
+  width: 100%;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.card__info__extra {
+  width: 100%;
+  max-width: 381px;
+  min-height: 82px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  justify-content: space-between;
+  padding: 8px;
+  box-sizing: border-box;
+  align-items: flex-start;
+  background: var(--color-surface-dim);
+  border-radius: var(--radius-sm);
+}
+
+/* ── Кнопки ── */
+.card__buttons {
+  width: 100%;
+  max-width: 201px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-start;
+  flex-shrink: 0;
+}
+
+.button__edit__data {
+  display: inline-flex;
+  align-items: center;
+  border: none;
+  background-color: transparent;
+  color: var(--font-color-muted);
+  font-family: var(--main-font);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: -0.16px;
+  gap: 15px;
+  cursor: pointer;
+  padding: 0;
+  width: fit-content;
+  white-space: nowrap;
+  transition: color 0.15s ease;
+}
+
+.button__edit__data:hover {
+  color: var(--color-accent);
+}
+
+/* ── Декор-картинка в углу ── */
+.card__decoration {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: clamp(180px, 25.7vw, 370px);
+  height: auto;
+  aspect-ratio: 370 / 302;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* ── Профиль: поля имени/почты ── */
+.profile__label {
+  color: var(--font-color-muted);
+  font-family: var(--main-font);
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: -0.28px;
+  line-height: 1.4;
+  margin: 0;
+}
+
+.profile__value {
+  color: var(--font-color);
+  font-family: var(--main-font);
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.36px;
+  line-height: 1.33;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.profile__field {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Hint-блок (extra info) ── */
+.extra__line {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.extra__text {
+  color: rgba(35, 11, 63, 0.8);
+  font-family: var(--main-font);
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: -0.24px;
+  line-height: 1.4;
+}
+
+.extra__text--accent {
+  color: var(--color-accent);
+  font-weight: 600;
+  font-style: normal;
+}
+
+.extra__text--default {
+  color: rgba(35, 11, 63, 0.8);
+  font-weight: 600;
+  font-style: italic;
+}
+
+.extra__icon {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  background: rgba(247, 10, 81, 0.1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.extra__icon svg {
+  display: block;
+}
+
+.extra__icon__dictaphone__wrapper {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  background: rgba(247, 10, 81, 0.1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
+  margin: 0 2px;
+  vertical-align: middle;
+}
+
+.extra__icon__dictaphone__img {
+  width: 120%;
+  height: 120%;
+  object-fit: cover;
+  object-position: -23px center;
+  position: absolute;
+  inset: 0;
+}
+
+.extra__icon__dictaphone__overlay {
+  position: absolute;
+  inset: 0;
+  background: var(--color-accent);
+  mix-blend-mode: color;
+  pointer-events: none;
+}
+
+/* ── Адаптив ── */
+@media (max-width: 1199px) {
+  .card__content    { height: 300px; }
+  .card__inner      { height: 270px; }
+  .card__info       { height: 270px; }
+  .card__photo      { width: 170px; height: 270px; }
+  .card__decoration { width: 200px; }
+  .card__info__main { gap: 20px; }
+  .card__info__extra { min-height: 72px; }
+  .profile__value   { font-size: 16px; }
+}
+
+@media (min-width: 1441px) {
+  .card__decoration { width: 370px; }
+}
