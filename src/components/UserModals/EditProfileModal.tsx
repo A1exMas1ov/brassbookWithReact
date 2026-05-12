@@ -28,10 +28,18 @@ interface Props {
   onClose: () => void;
   initialPersonal?: Partial<PersonalData>;
   initialCorporate?: Partial<CorporateData>;
+  onSave?: (personal: PersonalData, corporate: CorporateData) => Promise<void>;
 }
 
-export default function EditProfileModal({ onClose, initialPersonal = {}, initialCorporate = {} }: Props) {
+export default function EditProfileModal({
+  onClose,
+  initialPersonal = {},
+  initialCorporate = {},
+  onSave,
+}: Props) {
   const [activeTab, setActiveTab] = useState<TabId>("personal");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const modalRef = useRef<HTMLDivElement>(null);
   const isMouseDownInside = useRef(false);
 
@@ -57,19 +65,27 @@ export default function EditProfileModal({ onClose, initialPersonal = {}, initia
     }
   };
 
-  const handleSave = (e: React.FormEvent) => {
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Здесь будет отправка данных на сервер
-    onClose();
+    setError(null);
+    setIsSubmitting(true);
+    try {
+      await onSave?.(personal, corporate);
+      onClose();
+    } catch {
+      setError("Не удалось сохранить изменения. Попробуй снова.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
-    <div 
-      className={m.overlay} 
+    <div
+      className={m.overlay}
       onMouseDown={handleMouseDown}
-      onClick={handleOverlayClick} 
-      role="dialog" 
-      aria-modal="true" 
+      onClick={handleOverlayClick}
+      role="dialog"
+      aria-modal="true"
       aria-labelledby="edit-profile-title"
     >
       <div className={m.modal} style={{ maxWidth: 560 }} ref={modalRef}>
@@ -81,7 +97,6 @@ export default function EditProfileModal({ onClose, initialPersonal = {}, initia
           </button>
         </div>
 
-        {/* Табы */}
         <nav className={m.tabs} aria-label="Разделы редактирования">
           {(["personal", "corporate"] as TabId[]).map((tab) => (
             <button
@@ -181,8 +196,12 @@ export default function EditProfileModal({ onClose, initialPersonal = {}, initia
             </>
           )}
 
-          <button type="submit" className={m.btn__primary}>
-            СОХРАНИТЬ ИЗМЕНЕНИЯ
+          {error && (
+            <p style={{ color: "red", fontSize: 13, margin: "4px 0 0" }}>{error}</p>
+          )}
+
+          <button type="submit" className={m.btn__primary} disabled={isSubmitting}>
+            {isSubmitting ? "СОХРАНЕНИЕ..." : "СОХРАНИТЬ ИЗМЕНЕНИЯ"}
           </button>
         </form>
 

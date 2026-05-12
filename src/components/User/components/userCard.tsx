@@ -3,15 +3,11 @@ import cardClasses from "../styles/userCard.module.css";
 import IconArrow from "../../../assets/icons/IconArrow";
 import userCardAngle from "../../../assets/img/user_card_angle.png";
 import dictaphoneImg from "../../../assets/img/dictaphoneImg.png";
-import { useState } from "react";
-import ChangePasswordModal from "../../UserModals/ChangePasswordModal"
+import { useContext, useEffect, useState } from "react";
+import { observer } from "mobx-react-lite";
+import { Context } from "../../../../Context/context";
+import ChangePasswordModal from "../../UserModals/ChangePasswordModal";
 import EditProfileModal from "../../UserModals/EditProfileModal";
-
-const profileFields = [
-  { label: "Имя",     value: "Не заполнено"      },
-  { label: "Фамилия", value: "Не заполнено"     },
-  { label: "Почта",   value: "pelamore@mail.ru" },
-];
 
 function IconHeart() {
   return (
@@ -31,8 +27,30 @@ function IconDictaphone() {
 }
 
 function UserCard() {
+  const { profileStore } = useContext(Context);
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
   const [showEditProfile, setShowEditProfile] = useState(false);
+
+  useEffect(() => {
+    profileStore.fetchProfile();
+  }, []);
+
+  const user = profileStore.user;
+  const isCompany = user.role === "ROLE_COMPANY";
+
+  const profileFields = isCompany
+    ? [
+        { label: "Компания",  value: user.companyName        || "Не заполнено" },
+        { label: "Должность", value: user.profession         || "Не заполнено" },
+        { label: "ИНН",       value: user.inn?.toString()    || "Не заполнено" },
+        { label: "Почта",     value: user.email              || "Не заполнено" },
+      ]
+    : [
+        { label: "Имя",       value: user.displayName        || "Не заполнено" },
+        { label: "Фамилия",   value: user.displaySurname     || "Не заполнено" },
+        { label: "Почта",     value: user.email              || "Не заполнено" },
+      ];
+
   return (
     <div className={cardClasses.card__content}>
       <img
@@ -45,10 +63,9 @@ function UserCard() {
       <div className={cardClasses.card__inner}>
 
         <div className={cardClasses.card__photo}>
-          {/* 
-            Здесь будет <img src={avatarUrl} alt="Фото профиля" ... />
-            Пока блок остаётся пустым — заменяется при подключении данных пользователя.
-          */}
+          {user.photoUrl && (
+            <img src={user.photoUrl} alt="Фото профиля" className={cardClasses.card__photo__img} />
+          )}
         </div>
 
         <div className={cardClasses.card__info}>
@@ -77,19 +94,19 @@ function UserCard() {
                   <span className={cardClasses["extra__text--default"]}>Избранном</span>.
                 </span>
               </div>
-                <div className={cardClasses.extra__line}>
-                  <span className={cardClasses.extra__text}>
-                    Записи, которые ты делал с помощью
-                  </span>
-                  <span className={cardClasses.extra__text} style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                    <IconDictaphone />
-                    <span className={cardClasses["extra__text--accent"]}>Диктофона</span>
-                  </span>
-                  <span className={cardClasses.extra__text}>
-                    {" "}и загруженные треки находятся в разделе{" "}
-                    <span className={cardClasses["extra__text--default"]}>Мои Записи</span>.
-                  </span>
-                </div>
+              <div className={cardClasses.extra__line}>
+                <span className={cardClasses.extra__text}>
+                  Записи, которые ты делал с помощью
+                </span>
+                <span className={cardClasses.extra__text} style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                  <IconDictaphone />
+                  <span className={cardClasses["extra__text--accent"]}>Диктофона</span>
+                </span>
+                <span className={cardClasses.extra__text}>
+                  {" "}и загруженные треки находятся в разделе{" "}
+                  <span className={cardClasses["extra__text--default"]}>Мои Записи</span>.
+                </span>
+              </div>
             </div>
 
           </div>
@@ -101,9 +118,7 @@ function UserCard() {
             >
               Редактировать личные данные <IconArrow />
             </button>
-            
-            {/* 2. Вешаем клик на кнопку */}
-            <button 
+            <button
               className={cardClasses.button__edit__data}
               onClick={() => setIsPasswordModalOpen(true)}
             >
@@ -114,19 +129,38 @@ function UserCard() {
         </div>
       </div>
 
-      {/* 3. Рендерим модалку, если стейт true */}
       {isPasswordModalOpen && (
-        <ChangePasswordModal onClose={() => setIsPasswordModalOpen(false)} />
+        <ChangePasswordModal
+          onClose={() => setIsPasswordModalOpen(false)}
+          onSave={(cur, next) => profileStore.changePassword(cur, next)}
+        />
       )}
-            {/* Модалка редактирования профиля */}
+
       {showEditProfile && (
         <EditProfileModal
           onClose={() => setShowEditProfile(false)}
-          initialPersonal={{ firstName: "Не заполнено", lastName: "Не заполнено", email: "pelamore@mail.ru" }}
+          initialPersonal={{
+            firstName: user.displayName    || "",
+            lastName:  user.displaySurname || "",
+            email:     user.email          || "",
+          }}
+          initialCorporate={{
+            companyName: user.companyName      || "",
+            position:    user.profession       || "",
+            inn:         user.inn?.toString()  || "",
+          }}
+          onSave={async (personal, corporate) => {
+            await profileStore.updateProfile({
+              displayName:    personal.firstName,
+              displaySurname: personal.lastName,
+              email:          personal.email,
+              // corporate поля — когда напарник добавит в PUT /profile
+            });
+          }}
         />
       )}
     </div>
   );
 }
 
-export default UserCard;
+export default observer(UserCard);
