@@ -14,7 +14,6 @@ function RestoreAuth() {
     const [timeLeft, setTimeLeft] = useState(60);
     const [canResend, setCanResend] = useState(false);
     const [errorCode, setErrorCode] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
         if (timeLeft > 0) {
@@ -27,30 +26,25 @@ function RestoreAuth() {
 
     const handleChange = (index: number, value: string) => {
         if (value.length > 1 || isNaN(Number(value))) return;
-
         const newCode = [...code];
         newCode[index] = value;
         setCode(newCode);
         setErrorCode('');
-
         if (value && index < 5) {
-            const nextInput = document.getElementById(`code-${index + 1}`);
-            nextInput?.focus();
+            document.getElementById(`code-${index + 1}`)?.focus();
         }
     };
 
     const handleKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === 'Backspace' && !code[index] && index > 0) {
-            const prevInput = document.getElementById(`code-${index - 1}`);
-            prevInput?.focus();
+            document.getElementById(`code-${index - 1}`)?.focus();
         }
     };
 
+    // Повторная отправка — вызывает POST /refreshCode
     const handleResend = async () => {
         try {
-            if (store.restoreEmail) {
-                await store.checkEmailAndSendCode(store.restoreEmail);
-            }
+            await store.refreshCode(store.restoreEmail);
             setTimeLeft(60);
             setCanResend(false);
             setCode(['', '', '', '', '', '']);
@@ -60,24 +54,16 @@ function RestoreAuth() {
         }
     };
 
-    const handleVerify = async () => {
+    // Сохраняем код в store и переходим к смене пароля
+    const handleVerify = () => {
         const fullCode = code.join('');
         if (fullCode.length < 6) {
             setErrorCode('Введите все 6 цифр кода');
             return;
         }
-
-        setIsLoading(true);
-        try {
-            // Подтверждаем код (isConfirmed: true)
-            await store.confirmCode(store.restoreEmail);
-            navigate('/restore?success=true');
-        } catch (e: unknown) {
-            const msg = e instanceof Error ? e.message : 'Неверный или устаревший код';
-            setErrorCode(msg);
-        } finally {
-            setIsLoading(false);
-        }
+        // Сохраняем код — он понадобится в RestoreFormWithPass для PUT /registration
+        store.restoreCode = fullCode;
+        navigate('/restore?success=true');
     };
 
     return (
@@ -141,9 +127,9 @@ function RestoreAuth() {
                     isBtn={true}
                     className="button-type-2 sign-page-button"
                     onClick={handleVerify}
-                    disabled={isLoading}
+                    
                 >
-                    {isLoading ? 'Проверяем...' : 'Продолжить'}
+                    Продолжить
                 </Button>
                 <ImagePipe />
             </div>

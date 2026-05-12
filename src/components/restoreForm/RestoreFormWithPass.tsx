@@ -9,11 +9,9 @@ import { validatePassword, validatePasswordMatch } from "../utils/validation";
 const RestoreFormWithPass: FC = () => {
     const [password, setPassword] = useState('');
     const [repeatPassword, setRepeatPassword] = useState('');
-
     const [passwordErr, setPasswordErr] = useState('');
     const [repeatPasswordErr, setRepeatPasswordErr] = useState('');
     const [formErr, setFormErr] = useState('');
-
     const [showPassword, setShowPassword] = useState(false);
     const [showRepeatPassword, setShowRepeatPassword] = useState(false);
 
@@ -22,7 +20,6 @@ const RestoreFormWithPass: FC = () => {
 
     const validateForm = () => {
         let isValid = true;
-
         setPasswordErr('');
         setRepeatPasswordErr('');
 
@@ -44,14 +41,15 @@ const RestoreFormWithPass: FC = () => {
     const handleClick = async () => {
         if (!validateForm()) return;
 
-        // store.restoreUserId должен быть сохранён после подтверждения кода
-        if (!store.restoreUserId) {
-            setFormErr('Не удалось определить пользователя. Пройдите восстановление заново.');
+        // email и code сохранены в store на предыдущих шагах
+        if (!store.restoreEmail || !store.restoreCode) {
+            setFormErr('Сессия истекла. Пройдите восстановление заново.');
             return;
         }
 
         try {
-            await store.resetPassword(password, store.restoreUserId);
+            // PUT /registration { email, code, password }
+            await store.resetPassword(store.restoreEmail, store.restoreCode, password);
             navigate('/signin?recovery=true');
         } catch (e: unknown) {
             const msg = e instanceof Error ? e.message : 'Ошибка сервера';
@@ -76,11 +74,7 @@ const RestoreFormWithPass: FC = () => {
                             type={showPassword ? "text" : "password"}
                             style={{ paddingRight: '50px' }}
                         />
-                        <button
-                            type="button"
-                            onClick={() => setShowPassword(!showPassword)}
-                            className="button_show_password"
-                        >
+                        <button type="button" onClick={() => setShowPassword(!showPassword)} className="button_show_password">
                             <EyeToggle show={showPassword} onToggle={() => setShowPassword(!showPassword)} />
                         </button>
                     </div>
@@ -100,11 +94,7 @@ const RestoreFormWithPass: FC = () => {
                             type={showRepeatPassword ? "text" : "password"}
                             style={{ paddingRight: '50px' }}
                         />
-                        <button
-                            type="button"
-                            onClick={() => setShowRepeatPassword(!showRepeatPassword)}
-                            className="button_show_password"
-                        >
+                        <button type="button" onClick={() => setShowRepeatPassword(!showRepeatPassword)} className="button_show_password">
                             <EyeToggle show={showRepeatPassword} onToggle={() => setShowRepeatPassword(!showRepeatPassword)} />
                         </button>
                     </div>

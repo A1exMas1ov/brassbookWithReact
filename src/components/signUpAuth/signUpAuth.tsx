@@ -69,11 +69,7 @@ function SignUpAuth() {
 
         setIsLoading(true);
         try {
-            // Подтверждаем код (isConfirmed: true)
-            const email = store.pendingRegistration?.email ?? '';
-            await store.confirmCode(email);
-
-            // Завершаем регистрацию с кодом
+            // Сразу регистрируем с кодом — без лишнего confirmCode
             if (store.pendingRegistration) {
                 await store.registration({
                     ...store.pendingRegistration,
