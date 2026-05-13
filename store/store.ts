@@ -43,9 +43,9 @@ export default class Store {
 
     // ── РЕГИСТРАЦИЯ ──────────────────────────────────────────────────────
     // Шаг 1: отправить код на email
-    async sendCode(email: string) {
+    async sendCode(email: string, isConfirmed: boolean) {
         try {
-            await AuthService.sendCode(email, true);
+            await AuthService.sendCode(email, isConfirmed);
             return true;
         } catch (e: unknown) {
             console.error("Send code error:", getErrorMessage(e));
@@ -82,10 +82,10 @@ export default class Store {
 
     // ── ВОССТАНОВЛЕНИЕ ПАРОЛЯ ────────────────────────────────────────────
     // Отправить код на email для восстановления
-    async checkEmailAndSendCode(email: string) {
+    async checkEmailAndSendCode(email: string, isConfirmed: boolean) {
         this.setLoading(true);
         try {
-            await AuthService.refreshCode(email, true);
+            await AuthService.refreshCode(email, isConfirmed);
             this.restoreEmail = email;
             return true;
         } catch (e: unknown) {
@@ -95,7 +95,6 @@ export default class Store {
             this.setLoading(false);
         }
     }
-
 
     // Сменить пароль — бэк: PUT /registration { email, code, password }
     async resetPassword(email: string, code: string, newPassword: string) {

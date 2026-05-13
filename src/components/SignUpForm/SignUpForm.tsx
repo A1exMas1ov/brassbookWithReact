@@ -13,11 +13,13 @@ function SignUpForm({ className }: { className?: string }) {
     const { store } = useContext(Context);
 
     const [step, setStep] = useState(1);
+    const [isConfirmed, setIsConfirmed] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
     const [values, setValues] = useState({
-        firstName: '',      // было name
-        lastName: '',       // было secondName
+        firstName: '',
+        lastName: '',
         companyName: '',
-        profession: '',     // было position
+        profession: '',
         inn: '',
         email: '',
         password: '',
@@ -66,6 +68,10 @@ function SignUpForm({ className }: { className?: string }) {
         const matchValidation = validatePasswordMatch(values.password, values.repeatPassword);
         if (!matchValidation.isValid) newErrors.repeatPassword = matchValidation.error;
 
+        if (!isConfirmed) {
+            newErrors.confirmed = 'Необходимо согласиться с обработкой персональных данных';
+        }
+
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
@@ -78,10 +84,9 @@ function SignUpForm({ className }: { className?: string }) {
             }
         } else {
             if (validateStep2()) {
+                setIsLoading(true);
                 try {
-                    // Шаг 1: отправить код на email
-                    await store.sendCode(values.email);
-                    // Сохраняем данные формы в store для последующей регистрации
+                    await store.sendCode(values.email, isConfirmed);
                     store.pendingRegistration = {
                         email: values.email,
                         password: values.password,
@@ -92,12 +97,14 @@ function SignUpForm({ className }: { className?: string }) {
                         companyName: values.companyName,
                         profession: values.profession,
                         inn: values.inn ? Number(values.inn) : undefined,
-                        code: '' // код введёт пользователь на следующем шаге
+                        code: ''
                     };
                     navigate('/signupauth');
                 } catch (e: unknown) {
                     const msg = e instanceof Error ? e.message : 'Ошибка сервера';
                     setErrors({ form: msg });
+                } finally {
+                    setIsLoading(false);
                 }
             }
         }
@@ -197,6 +204,23 @@ function SignUpForm({ className }: { className?: string }) {
                                 {errors.repeatPassword && <span className={classes.errorUnder}><FaExclamationCircle /> {errors.repeatPassword}</span>}
                             </div>
 
+                            <div className={classes.signform__field} style={{ flexDirection: 'row', alignItems: 'center', gap: '10px' }}>
+                                <input
+                                    type="checkbox"
+                                    id="isConfirmed"
+                                    checked={isConfirmed}
+                                    onChange={e => {
+                                        setIsConfirmed(e.target.checked);
+                                        if (errors.confirmed) setErrors({ ...errors, confirmed: '' });
+                                    }}
+                                    style={{ width: 'auto', cursor: 'pointer' }}
+                                />
+                                <label htmlFor="isConfirmed" style={{ cursor: 'pointer', marginBottom: 0 }}>
+                                    Я согласен(а) с обработкой персональных данных
+                                </label>
+                            </div>
+                            {errors.confirmed && <span className={classes.errorUnder}><FaExclamationCircle /> {errors.confirmed}</span>}
+
                             {errors.form && (
                                 <span className={classes.errorUnder}><FaExclamationCircle /> {errors.form}</span>
                             )}
@@ -206,8 +230,8 @@ function SignUpForm({ className }: { className?: string }) {
             </div>
 
             <div className="sign-form__btn-container">
-                <Button isBtn={true} onClick={handleContinue} className="button-type-2 sign-page-button">
-                    {step === 1 ? "Продолжить" : "Продолжить"}
+                <Button isBtn={true} onClick={handleContinue} className="button-type-2 sign-page-button" disabled={isLoading}>
+                    {isLoading ? 'Отправляем...' : 'Продолжить'}
                 </Button>
             </div>
         </form>

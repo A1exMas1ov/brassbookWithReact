@@ -9,6 +9,7 @@ import RestorePage from "./components/RestorePage.tsx";
 import RestoreAuthPage from "./components/RestoreAuthPage.tsx";
 import Publications from "./components/Publications/Publications.tsx";
 import PublicationDetail from "./components/Publications/PublicationDetail.tsx";
+import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
   return (
@@ -19,6 +20,16 @@ function App() {
         <Route path="/signup" element={<SignUpPage />} />
         <Route path="/signupauth" element={<SignUpAuthPage />} />
         <Route path="/account" element={<Account />} />
+
+        <Route 
+                  path="/user" 
+                  element={
+                    <ProtectedRoute>
+                      <UserPage />
+                    </ProtectedRoute>
+                  } 
+        />
+
         <Route path="/user" element={<UserPage />} />
         <Route path="/restore" element={<RestorePage />} />
         <Route path="/restoreauth" element={<RestoreAuthPage />} />

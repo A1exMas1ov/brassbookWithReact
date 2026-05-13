@@ -4,6 +4,7 @@ import { useState, useEffect, useContext } from "react";
 import Button from "../button/Button.tsx";
 import classes from "./signupauth.module.css";
 import { Context } from "../../main.tsx";
+import { FaExclamationCircle } from "react-icons/fa";
 
 function SignUpAuth() {
     const { store } = useContext(Context);
@@ -14,6 +15,7 @@ function SignUpAuth() {
     const [canResend, setCanResend] = useState(false);
     const [errorCode, setErrorCode] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [isResending, setIsResending] = useState(false);
 
     useEffect(() => {
         if (timeLeft > 0) {
@@ -46,10 +48,11 @@ function SignUpAuth() {
     };
 
     const handleResend = async () => {
+        setIsResending(true);
         try {
             const email = store.pendingRegistration?.email;
             if (email) {
-                await store.sendCode(email);
+                await store.sendCode(email, true);
             }
             setTimeLeft(60);
             setCanResend(false);
@@ -57,6 +60,8 @@ function SignUpAuth() {
         } catch (e: unknown) {
             const msg = e instanceof Error ? e.message : 'Ошибка при повторной отправке';
             setErrorCode(msg);
+        } finally {
+            setIsResending(false);
         }
     };
 
@@ -69,7 +74,6 @@ function SignUpAuth() {
 
         setIsLoading(true);
         try {
-            // Сразу регистрируем с кодом — без лишнего confirmCode
             if (store.pendingRegistration) {
                 await store.registration({
                     ...store.pendingRegistration,
@@ -107,10 +111,15 @@ function SignUpAuth() {
                     <p className="sign-in__backlink">
                         Не пришел код? {canResend ? (
                             <span
-                                onClick={handleResend}
-                                style={{ textDecoration: 'underline', cursor: 'pointer', color: 'inherit' }}
+                                onClick={isResending ? undefined : handleResend}
+                                style={{
+                                    textDecoration: 'underline',
+                                    cursor: isResending ? 'default' : 'pointer',
+                                    color: 'inherit',
+                                    opacity: isResending ? 0.5 : 1
+                                }}
                             >
-                                Отправить код повторно
+                                {isResending ? 'Отправляем...' : 'Отправить код повторно'}
                             </span>
                         ) : (
                             `Отправить повторно через ${timeLeft} секунд`
@@ -134,11 +143,8 @@ function SignUpAuth() {
                     </div>
 
                     {errorCode && (
-                        <div className={classes.errorMsg}>
-                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <circle cx="10" cy="10" r="10" fill="#FF4D4D"/>
-                                <path d="M10 5V11M10 13H10.01" stroke="white" strokeWidth="2" strokeLinecap="round"/>
-                            </svg>
+                        <div className="errorUnder">
+                            <FaExclamationCircle />
                             <span>{errorCode}</span>
                         </div>
                     )}

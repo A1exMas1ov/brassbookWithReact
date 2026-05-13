@@ -6,7 +6,9 @@ import { FaExclamationCircle } from "react-icons/fa";
 
 const RestoreForm: FC = () => {
     const [email, setEmail] = useState<string>('');
+    //const [isConfirmed, setIsConfirmed] = useState(false);
     const [emailErr, setEmailErr] = useState('');
+    //const [confirmedErr, setConfirmedErr] = useState('');
     const [formErr, setFormErr] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 
@@ -15,16 +17,24 @@ const RestoreForm: FC = () => {
 
     const handleClick = async () => {
         setEmailErr('');
+        //setConfirmedErr('');
         setFormErr('');
+
+        let isValid = true;
 
         if (!email) {
             setEmailErr('Заполните обязательное поле');
-            return;
+            isValid = false;
         }
+        // if (!isConfirmed) {
+        //     setConfirmedErr('Необходимо согласиться с обработкой персональных данных');
+        //     isValid = false;
+        // }
+        if (!isValid) return;
 
         setIsLoading(true);
         try {
-            await store.checkEmailAndSendCode(email);
+            await store.checkEmailAndSendCode(email, true);
             navigate('/restoreauth');
         } catch (e: unknown) {
             const msg = e instanceof Error ? e.message : 'Ошибка сервера';
@@ -51,6 +61,23 @@ const RestoreForm: FC = () => {
                         type="email"
                     />
                 </div>
+
+                {/* <div className="sign-form__field" style={{ flexDirection: 'row', alignItems: 'center', gap: '10px' }}>
+                    <input
+                        type="checkbox"
+                        id="isConfirmed"
+                        checked={isConfirmed}
+                        onChange={e => {
+                            setIsConfirmed(e.target.checked);
+                            setConfirmedErr('');
+                        }}
+                        style={{ width: 'auto', cursor: 'pointer' }}
+                    />
+                    <label htmlFor="isConfirmed" style={{ cursor: 'pointer', marginBottom: 0 }}>
+                        Я согласен(а) с обработкой персональных данных
+                    </label>
+                </div>
+                {confirmedErr && <span className="errorUnder"><FaExclamationCircle /> {confirmedErr}</span>} */}
             </div>
             <div className="sign-form__btn-container">
                 <Button onClick={handleClick} isBtn={true} className="button-type-2 sign-page-button" disabled={isLoading}>

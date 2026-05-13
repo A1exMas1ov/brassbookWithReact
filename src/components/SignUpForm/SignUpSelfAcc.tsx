@@ -12,11 +12,14 @@ const SignUpSelfAcc = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [repeatPassword, setRepeatPassword] = useState('');
+    const [isConfirmed, setIsConfirmed] = useState(false);
 
     const [emailErr, setEmailErr] = useState('');
     const [passwordErr, setPasswordErr] = useState('');
     const [repeatPasswordErr, setRepeatPasswordErr] = useState('');
+    const [confirmedErr, setConfirmedErr] = useState('');
     const [formErr, setFormErr] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
 
     const [showPassword, setShowPassword] = useState(false);
     const [showRepeatPassword, setShowRepeatPassword] = useState(false);
@@ -30,6 +33,7 @@ const SignUpSelfAcc = () => {
         setEmailErr('');
         setPasswordErr('');
         setRepeatPasswordErr('');
+        setConfirmedErr('');
 
         const emailValidation = validateEmail(email);
         if (!emailValidation.isValid) {
@@ -49,29 +53,35 @@ const SignUpSelfAcc = () => {
             isValid = false;
         }
 
+        if (!isConfirmed) {
+            setConfirmedErr('Необходимо согласиться с обработкой персональных данных');
+            isValid = false;
+        }
+
         return isValid;
     };
 
     const handleRegistration = async () => {
         if (!validateForm()) return;
 
+        setIsLoading(true);
         try {
-            // Шаг 1: отправить код на email
-            await store.sendCode(email);
+            await store.sendCode(email, isConfirmed);
 
-            // Сохраняем данные в store для завершения регистрации после ввода кода
             store.pendingRegistration = {
                 email,
                 password,
                 roleName: UserRole.ROLE_PERSONAL,
                 status: UserStatus.ACTIVATE,
-                code: '' // код введёт пользователь на следующем шаге
+                code: ''
             };
 
             navigate('/signupauth');
         } catch (e: unknown) {
             const msg = e instanceof Error ? e.message : 'Ошибка сервера';
             setFormErr(msg);
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -145,6 +155,23 @@ const SignUpSelfAcc = () => {
                     </div>
                 </div>
 
+                <div className="sign-form__field" style={{ flexDirection: 'row', alignItems: 'center', gap: '10px' }}>
+                    <input
+                        type="checkbox"
+                        id="isConfirmed"
+                        checked={isConfirmed}
+                        onChange={e => {
+                            setIsConfirmed(e.target.checked);
+                            setConfirmedErr('');
+                        }}
+                        style={{ width: 'auto', cursor: 'pointer' }}
+                    />
+                    <label htmlFor="isConfirmed" style={{ cursor: 'pointer', marginBottom: 0 }}>
+                        Я согласен(а) с обработкой персональных данных
+                    </label>
+                </div>
+                {confirmedErr && <span className={classes.errorUnder}><FaExclamationCircle /> {confirmedErr}</span>}
+
                 {formErr && <span className={classes.errorUnder}><FaExclamationCircle /> {formErr}</span>}
             </div>
 
@@ -153,8 +180,9 @@ const SignUpSelfAcc = () => {
                     onClick={handleRegistration}
                     isBtn={true}
                     className="button-type-2 sign-page-button"
+                    disabled={isLoading}
                 >
-                    Продолжить
+                    {isLoading ? 'Отправляем...' : 'Продолжить'}
                 </Button>
             </div>
         </form>

@@ -14,6 +14,7 @@ function RestoreAuth() {
     const [timeLeft, setTimeLeft] = useState(60);
     const [canResend, setCanResend] = useState(false);
     const [errorCode, setErrorCode] = useState('');
+    const [isResending, setIsResending] = useState(false);
 
     useEffect(() => {
         if (timeLeft > 0) {
@@ -41,8 +42,8 @@ function RestoreAuth() {
         }
     };
 
-    // Повторная отправка — вызывает POST /refreshCode
     const handleResend = async () => {
+        setIsResending(true);
         try {
             await store.refreshCode(store.restoreEmail);
             setTimeLeft(60);
@@ -51,17 +52,17 @@ function RestoreAuth() {
         } catch (e: unknown) {
             const msg = e instanceof Error ? e.message : 'Ошибка при повторной отправке';
             setErrorCode(msg);
+        } finally {
+            setIsResending(false);
         }
     };
 
-    // Сохраняем код в store и переходим к смене пароля
     const handleVerify = () => {
         const fullCode = code.join('');
         if (fullCode.length < 6) {
             setErrorCode('Введите все 6 цифр кода');
             return;
         }
-        // Сохраняем код — он понадобится в RestoreFormWithPass для PUT /registration
         store.restoreCode = fullCode;
         navigate('/restore?success=true');
     };
@@ -90,10 +91,15 @@ function RestoreAuth() {
                     <p className="sign-in__backlink">
                         Не пришел код? {canResend ? (
                             <span
-                                onClick={handleResend}
-                                style={{ textDecoration: 'underline', cursor: 'pointer', color: 'inherit' }}
+                                onClick={isResending ? undefined : handleResend}
+                                style={{
+                                    textDecoration: 'underline',
+                                    cursor: isResending ? 'default' : 'pointer',
+                                    color: 'inherit',
+                                    opacity: isResending ? 0.5 : 1
+                                }}
                             >
-                                Отправить код повторно
+                                {isResending ? 'Отправляем...' : 'Отправить код повторно'}
                             </span>
                         ) : (
                             `Отправить повторно через ${timeLeft} секунд`
@@ -127,7 +133,7 @@ function RestoreAuth() {
                     isBtn={true}
                     className="button-type-2 sign-page-button"
                     onClick={handleVerify}
-                    
+                    disabled={isResending}
                 >
                     Продолжить
                 </Button>

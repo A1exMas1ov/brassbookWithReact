@@ -14,6 +14,7 @@ const RestoreFormWithPass: FC = () => {
     const [formErr, setFormErr] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [showRepeatPassword, setShowRepeatPassword] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
     const { store } = useContext(Context);
     const navigate = useNavigate();
@@ -41,19 +42,20 @@ const RestoreFormWithPass: FC = () => {
     const handleClick = async () => {
         if (!validateForm()) return;
 
-        // email и code сохранены в store на предыдущих шагах
         if (!store.restoreEmail || !store.restoreCode) {
             setFormErr('Сессия истекла. Пройдите восстановление заново.');
             return;
         }
 
+        setIsLoading(true);
         try {
-            // PUT /registration { email, code, password }
             await store.resetPassword(store.restoreEmail, store.restoreCode, password);
             navigate('/signin?recovery=true');
         } catch (e: unknown) {
             const msg = e instanceof Error ? e.message : 'Ошибка сервера';
             setFormErr(msg);
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -104,8 +106,8 @@ const RestoreFormWithPass: FC = () => {
             </div>
 
             <div className="sign-form__btn-container">
-                <Button onClick={handleClick} isBtn={true} className="button-type-2 sign-page-button">
-                    Сменить пароль
+                <Button onClick={handleClick} isBtn={true} className="button-type-2 sign-page-button" disabled={isLoading}>
+                    {isLoading ? 'Меняем пароль...' : 'Сменить пароль'}
                 </Button>
             </div>
         </form>
