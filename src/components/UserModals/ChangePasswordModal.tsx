@@ -25,9 +25,10 @@ const IconEyeOff = () => (
 
 interface ChangePasswordModalProps {
   onClose: () => void;
+  onSave?: (currentPassword: string, newPassword: string) => Promise<void>;
 }
 
-function ChangePasswordModal({ onClose }: ChangePasswordModalProps) {
+function ChangePasswordModal({ onClose, onSave }: ChangePasswordModalProps) {
   const currentPasswordId = useId();
   const newPasswordId = useId();
   const modalRef = useRef<HTMLDivElement>(null);
@@ -35,9 +36,10 @@ function ChangePasswordModal({ onClose }: ChangePasswordModalProps) {
 
   const [currentPasswordVisible, setCurrentPasswordVisible] = useState(false);
   const [newPasswordVisible, setNewPasswordVisible] = useState(false);
-  
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleMouseDown = (e: React.MouseEvent) => {
     isMouseDownInside.current = modalRef.current?.contains(e.target as Node) ?? false;
@@ -49,17 +51,31 @@ function ChangePasswordModal({ onClose }: ChangePasswordModalProps) {
     }
   };
 
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setIsSubmitting(true);
+    try {
+      await onSave?.(currentPassword, newPassword);
+      onClose();
+    } catch {
+      setError("Не удалось изменить пароль. Проверь текущий пароль и попробуй снова.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
-    <div 
-      className={m.overlay} 
+    <div
+      className={m.overlay}
       onMouseDown={handleMouseDown}
       onClick={handleOverlayClick}
-      role="dialog" 
-      aria-modal="true" 
+      role="dialog"
+      aria-modal="true"
       aria-labelledby="change-password-title"
     >
       <div className={m.modal} ref={modalRef}>
-        
+
         <div className={m.modal__header}>
           <h2 id="change-password-title" className={m.modal__title}>Изменение пароля</h2>
           <button type="button" aria-label="Закрыть" className={m.modal__close} onClick={onClose}>
@@ -67,9 +83,8 @@ function ChangePasswordModal({ onClose }: ChangePasswordModalProps) {
           </button>
         </div>
 
-        <form className={m.form} onSubmit={(event) => event.preventDefault()}>
-          
-          {/* Текущий пароль */}
+        <form className={m.form} onSubmit={handleSubmit}>
+
           <div className={m.field}>
             <label htmlFor={currentPasswordId} className={m.field__label}>
               Текущий пароль
@@ -81,7 +96,7 @@ function ChangePasswordModal({ onClose }: ChangePasswordModalProps) {
                 type={currentPasswordVisible ? "text" : "password"}
                 value={currentPassword}
                 placeholder="Введи текущий пароль"
-                onChange={(event) => setCurrentPassword(event.target.value)}
+                onChange={(e) => setCurrentPassword(e.target.value)}
                 className={m.field__input}
                 style={{ paddingRight: 56 }}
                 autoFocus
@@ -90,18 +105,12 @@ function ChangePasswordModal({ onClose }: ChangePasswordModalProps) {
                 type="button"
                 onClick={() => setCurrentPasswordVisible((v) => !v)}
                 style={{
-                  position: "absolute",
-                  right: 16,
-                  top: "50%",
-                  transform: "translateY(-50%)",
-                  background: "none",
-                  border: "none",
-                  cursor: "pointer",
+                  position: "absolute", right: 16, top: "50%",
+                  transform: "translateY(-50%)", background: "none",
+                  border: "none", cursor: "pointer",
                   color: "rgba(35, 11, 63, 0.4)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  padding: 4,
+                  display: "flex", alignItems: "center",
+                  justifyContent: "center", padding: 4,
                 }}
               >
                 {currentPasswordVisible ? <IconEyeOff /> : <IconEye />}
@@ -109,7 +118,6 @@ function ChangePasswordModal({ onClose }: ChangePasswordModalProps) {
             </div>
           </div>
 
-          {/* Новый пароль */}
           <div className={m.field}>
             <label htmlFor={newPasswordId} className={m.field__label}>
               Новый пароль
@@ -121,7 +129,7 @@ function ChangePasswordModal({ onClose }: ChangePasswordModalProps) {
                 type={newPasswordVisible ? "text" : "password"}
                 value={newPassword}
                 placeholder="Введи новый пароль"
-                onChange={(event) => setNewPassword(event.target.value)}
+                onChange={(e) => setNewPassword(e.target.value)}
                 className={m.field__input}
                 style={{ paddingRight: 56 }}
               />
@@ -129,18 +137,12 @@ function ChangePasswordModal({ onClose }: ChangePasswordModalProps) {
                 type="button"
                 onClick={() => setNewPasswordVisible((v) => !v)}
                 style={{
-                  position: "absolute",
-                  right: 16,
-                  top: "50%",
-                  transform: "translateY(-50%)",
-                  background: "none",
-                  border: "none",
-                  cursor: "pointer",
+                  position: "absolute", right: 16, top: "50%",
+                  transform: "translateY(-50%)", background: "none",
+                  border: "none", cursor: "pointer",
                   color: "rgba(35, 11, 63, 0.4)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  padding: 4,
+                  display: "flex", alignItems: "center",
+                  justifyContent: "center", padding: 4,
                 }}
               >
                 {newPasswordVisible ? <IconEyeOff /> : <IconEye />}
@@ -150,14 +152,17 @@ function ChangePasswordModal({ onClose }: ChangePasswordModalProps) {
 
           <div className={m.forgot__password}>
             <span>Забыли пароль?</span>
-            
             <NavLink to="/restore" className={m.forgot__passwordLink}>
               Восстановить
             </NavLink>
           </div>
 
-          <button type="submit" className={m.btn__primary}>
-            ИЗМЕНИТЬ ПАРОЛЬ
+          {error && (
+            <p style={{ color: "red", fontSize: 13, margin: "4px 0 0" }}>{error}</p>
+          )}
+
+          <button type="submit" className={m.btn__primary} disabled={isSubmitting}>
+            {isSubmitting ? "СОХРАНЕНИЕ..." : "ИЗМЕНИТЬ ПАРОЛЬ"}
           </button>
 
         </form>
