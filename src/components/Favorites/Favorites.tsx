@@ -16,10 +16,19 @@ import IconArrow from "../../assets/icons/IconArrow";
 type SortOption = "alphabet" | "popularity" | "duration";
 
 
-function IconHeart({ filled }: { filled: boolean }) {
+function IconHeart() {
   return (
     <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M9.59001 1.80835C8.53417 1.80835 7.58917 2.32168 7.00001 3.10918C6.41084 2.32168 5.46584 1.80835 4.41001 1.80835C2.61917 1.80835 1.16667 3.26668 1.16667 5.06918C1.16667 5.76335 1.27751 6.40502 1.47001 7.00002C2.39167 9.91668 5.23251 11.6608 6.63834 12.1392C6.83667 12.2092 7.16334 12.2092 7.36167 12.1392C8.76751 11.6608 11.6083 9.91668 12.53 7.00002C12.7225 6.40502 12.8333 5.76335 12.8333 5.06918C12.8333 3.26668 11.3808 1.80835 9.59001 1.80835Z" fill={filled ? "#F70A51" : "#C3C3D0"}/>
+      <path d="M9.59001 1.80835C8.53417 1.80835 7.58917 2.32168 7.00001 3.10918C6.41084 2.32168 5.46584 1.80835 4.41001 1.80835C2.61917 1.80835 1.16667 3.26668 1.16667 5.06918C1.16667 5.76335 1.27751 6.40502 1.47001 7.00002C2.39167 9.91668 5.23251 11.6608 6.63834 12.1392C6.83667 12.2092 7.16334 12.2092 7.36167 12.1392C8.76751 11.6608 11.6083 9.91668 12.53 7.00002C12.7225 6.40502 12.8333 5.76335 12.8333 5.06918C12.8333 3.26668 11.3808 1.80835 9.59001 1.80835Z" fill="#F70A51"/>
+    </svg>
+  );
+}
+
+function IconHeartBig({ filled }: { filled: boolean }) {
+  return (
+    <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="40" height="40" rx="8" fill={filled ? "#F70A51" : "#C3C3D0"} fill-opacity="0.1"/>
+      <path d="M25.18 9.6167C23.0683 9.6167 21.1783 10.6434 20 12.2184C18.8217 10.6434 16.9317 9.6167 14.82 9.6167C11.2383 9.6167 8.33333 12.5334 8.33333 16.1384C8.33333 17.5267 8.55499 18.81 8.93999 20C10.7833 25.8334 16.465 29.3217 19.2767 30.2784C19.6733 30.4184 20.3267 30.4184 20.7233 30.2784C23.535 29.3217 29.2167 25.8334 31.06 20C31.445 18.81 31.6667 17.5267 31.6667 16.1384C31.6667 12.5334 28.7617 9.6167 25.18 9.6167Z" fill={filled ? "#F70A51" : "#C3C3D0"}/>
     </svg>
   );
 }
@@ -103,7 +112,7 @@ function TrackRow({ record, isSelected, onSelect, onToggleFavorite, onAddToAlbum
             aria-label="Убрать из избранного"
             onClick={onToggleFavorite}
           >
-            <IconHeart filled={record.isFavorite} />
+            <IconHeartBig filled={record.isFavorite} />
           </button>
 
           {/* Добавить в альбом */}
@@ -211,7 +220,7 @@ const Favorites = observer(function Favorites() {
                       Композиции, отмеченные тобою
                     </span>
                     <span className={styles.header__heart__icon} aria-hidden="true">
-                      <IconHeart filled/>
+                      <IconHeart/>
                     </span>
                     <span className={styles.header__hint__text}>
                       , находятся здесь.
