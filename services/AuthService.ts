@@ -1,10 +1,10 @@
 import { AxiosResponse } from "axios";
-import { TokenResponse } from "../models/response/TokenResponse.ts";
+import { TokenResponse } from "../models/response/TokenResponse";
 import $api from "../http";
 import { RegistrationData } from "../models/RegistrationData";
 
 export interface RegistrationResponse {
-    id: number; // бэк возвращает только id созданного пользователя
+    id: number;
 }
 
 export default class AuthService {
@@ -19,22 +19,29 @@ export default class AuthService {
         return $api.post<TokenResponse>('/auth/init');
     }
 
-    // POST /api/v1/registration — создать пользователя (шаг 2 после sendCode)
+    // POST /api/v1/registration — создать пользователя с кодом
     static async registration(data: RegistrationData): Promise<AxiosResponse<RegistrationResponse>> {
         return $api.post<RegistrationResponse>('/registration', data);
     }
 
-    // POST /api/v1/sendCode — отправить/проверить код на email
-    // isConfirmed: false = просто отправить код, true = подтвердить
+    // POST /api/v1/sendCode — отправить код на email (isConfirmed: false = отправить, true = подтвердить)
     static async sendCode(email: string, isConfirmed: boolean): Promise<AxiosResponse<void>> {
         return $api.post<void>('/sendCode', { email, isConfirmed });
     }
 
-    // PUT /api/v1/registration — обновить пароль по id пользователя
-    static async updatePassword(password: string, id: number): Promise<AxiosResponse<void>> {
-        return $api.put<void>('/registration', { password, id });
+    // POST /api/v1/refreshCode — повторно отправить код (кнопка "Отправить повторно")
+    static async refreshCode(email: string, isConfirmed: boolean): Promise<AxiosResponse<void>> {
+        return $api.post<void>('/refreshCode', { email, isConfirmed });
     }
 
-    // GET /api/v1/token/refresh — обновить токены (вызывается автоматически в интерцепторе)
-    // Вручную использовать не нужно — интерцептор в index.ts делает это сам
+    // PUT /api/v1/registration — сменить пароль { email, code, password }
+    static async updatePassword(email: string, code: string, password: string): Promise<AxiosResponse<void>> {
+        return $api.put<void>('/registration', { email, code, password });
+    }
+
+    static async verifyRestoreCode(email: string, code: string) {
+    return $api.post('/verifyCode', { email, code });
+    }
+
+    // GET /api/v1/token/refresh — обновляется автоматически через интерцептор в index.ts
 }

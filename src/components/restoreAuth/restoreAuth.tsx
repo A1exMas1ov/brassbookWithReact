@@ -14,7 +14,8 @@ function RestoreAuth() {
     const [timeLeft, setTimeLeft] = useState(60);
     const [canResend, setCanResend] = useState(false);
     const [errorCode, setErrorCode] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
+    const [isResending, setIsResending] = useState(false);
+     const [isVerifying, setIsVerifying] = useState(false);
 
     useEffect(() => {
         if (timeLeft > 0) {
@@ -27,36 +28,33 @@ function RestoreAuth() {
 
     const handleChange = (index: number, value: string) => {
         if (value.length > 1 || isNaN(Number(value))) return;
-
         const newCode = [...code];
         newCode[index] = value;
         setCode(newCode);
         setErrorCode('');
-
         if (value && index < 5) {
-            const nextInput = document.getElementById(`code-${index + 1}`);
-            nextInput?.focus();
+            document.getElementById(`code-${index + 1}`)?.focus();
         }
     };
 
     const handleKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === 'Backspace' && !code[index] && index > 0) {
-            const prevInput = document.getElementById(`code-${index - 1}`);
-            prevInput?.focus();
+            document.getElementById(`code-${index - 1}`)?.focus();
         }
     };
 
     const handleResend = async () => {
+        setIsResending(true);
         try {
-            if (store.restoreEmail) {
-                await store.checkEmailAndSendCode(store.restoreEmail);
-            }
+            await store.refreshCode(store.restoreEmail);
             setTimeLeft(60);
             setCanResend(false);
             setCode(['', '', '', '', '', '']);
         } catch (e: unknown) {
             const msg = e instanceof Error ? e.message : 'Ошибка при повторной отправке';
             setErrorCode(msg);
+        } finally {
+            setIsResending(false);
         }
     };
 
@@ -66,17 +64,18 @@ function RestoreAuth() {
             setErrorCode('Введите все 6 цифр кода');
             return;
         }
-
-        setIsLoading(true);
+        setIsVerifying(true);
         try {
-            // Подтверждаем код (isConfirmed: true)
-            await store.confirmCode(store.restoreEmail);
+            await store.verifyRestoreCode(store.restoreEmail, fullCode);
+            store.restoreCode = fullCode;
             navigate('/restore?success=true');
         } catch (e: unknown) {
-            const msg = e instanceof Error ? e.message : 'Неверный или устаревший код';
+            const msg = e instanceof Error ? e.message : 'Неверный код';
             setErrorCode(msg);
+            setCode(['', '', '', '', '', '']);
+            document.getElementById('code-0')?.focus();
         } finally {
-            setIsLoading(false);
+            setIsVerifying(false);
         }
     };
 
@@ -104,10 +103,15 @@ function RestoreAuth() {
                     <p className="sign-in__backlink">
                         Не пришел код? {canResend ? (
                             <span
-                                onClick={handleResend}
-                                style={{ textDecoration: 'underline', cursor: 'pointer', color: 'inherit' }}
+                                onClick={isResending ? undefined : handleResend}
+                                style={{
+                                    textDecoration: 'underline',
+                                    cursor: isResending ? 'default' : 'pointer',
+                                    color: 'inherit',
+                                    opacity: isResending ? 0.5 : 1
+                                }}
                             >
-                                Отправить код повторно
+                                {isResending ? 'Отправляем...' : 'Отправить код повторно'}
                             </span>
                         ) : (
                             `Отправить повторно через ${timeLeft} секунд`
@@ -141,9 +145,9 @@ function RestoreAuth() {
                     isBtn={true}
                     className="button-type-2 sign-page-button"
                     onClick={handleVerify}
-                    disabled={isLoading}
+                    disabled={isResending || isVerifying}
                 >
-                    {isLoading ? 'Проверяем...' : 'Продолжить'}
+                    {isVerifying ? 'Проверяем...' : 'Продолжить'}
                 </Button>
                 <ImagePipe />
             </div>

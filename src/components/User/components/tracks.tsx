@@ -8,7 +8,7 @@ import EditAlbumModal from "../../UserModals/EditAlbumModal";
 import { Context } from "../../../../Context/context";
 import { IAlbum } from "../../../../models/response/IAlbum";
 import IconArrow from "../../../assets/icons/IconArrow";
-import IconSearch from "../../../assets/icons/IconSearch";
+import SearchIcon from "../../../assets/icons/IconSearch";
 
 type SortOption = "alphabet" | "date";
 
@@ -31,14 +31,12 @@ const Tracks = observer(function Tracks() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [editingAlbum, setEditingAlbum]   = useState<IAlbum | null>(null);
 
-  // Загружаем альбомы при монтировании
   useEffect(() => {
     albumStore.loadAlbums(0, "createdAt");
     albumStore.loadFavorites(0);
     albumStore.loadMyRecords(0);
   }, [albumStore]);
 
-  // Фильтрация и сортировка альбомов на фронте (поверх того что пришло с бэка)
   const filteredAlbums = useMemo(() => {
     const q = searchValue.trim().toLowerCase();
     let result = [...albumStore.albums];
@@ -60,7 +58,7 @@ const Tracks = observer(function Tracks() {
     try {
       await albumStore.createAlbum(name);
     } catch {
-      // ошибка в albumStore
+      // ошибка в сторе
     }
   };
 
@@ -69,7 +67,7 @@ const Tracks = observer(function Tracks() {
     try {
       await albumStore.renameAlbum(editingAlbum.id, name);
     } catch {
-      // ошибка в albumStore
+      // ошибка уже в сторе
     }
   };
 
@@ -78,7 +76,7 @@ const Tracks = observer(function Tracks() {
     try {
       await albumStore.deleteAlbum(editingAlbum.id);
     } catch {
-      // ошибка в albumStore
+      // ошибка уже в сторе
     }
   };
 
@@ -118,8 +116,7 @@ const Tracks = observer(function Tracks() {
               height: "auto",
               objectFit: "cover",
               borderRadius: "0 20px 20px 0",
-            }} 
-            aria-hidden="true"
+          }} aria-hidden="true"
           />
         </article>
 
@@ -142,7 +139,7 @@ const Tracks = observer(function Tracks() {
               borderRadius: "0 20px 20px 0",
           }} aria-hidden="true"
           />
-       </article>
+        </article>
       </div>
 
       {/* ── Секция альбомов ── */}
@@ -156,7 +153,7 @@ const Tracks = observer(function Tracks() {
 
         {/* Поиск */}
         <div className={tracksClasses.search__bar}>
-          <IconSearch />
+          <SearchIcon />
           <input
             id={searchId}
             type="search"
@@ -272,7 +269,7 @@ const Tracks = observer(function Tracks() {
   );
 });
 
-// Склонение слова "запись"
+// Склонение слова
 function pluralRecord(n: number): string {
   const mod10 = n % 10;
   const mod100 = n % 100;

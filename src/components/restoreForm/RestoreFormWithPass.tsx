@@ -9,20 +9,18 @@ import { validatePassword, validatePasswordMatch } from "../utils/validation";
 const RestoreFormWithPass: FC = () => {
     const [password, setPassword] = useState('');
     const [repeatPassword, setRepeatPassword] = useState('');
-
     const [passwordErr, setPasswordErr] = useState('');
     const [repeatPasswordErr, setRepeatPasswordErr] = useState('');
     const [formErr, setFormErr] = useState('');
-
     const [showPassword, setShowPassword] = useState(false);
     const [showRepeatPassword, setShowRepeatPassword] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
     const { store } = useContext(Context);
     const navigate = useNavigate();
 
     const validateForm = () => {
         let isValid = true;
-
         setPasswordErr('');
         setRepeatPasswordErr('');
 
@@ -44,18 +42,20 @@ const RestoreFormWithPass: FC = () => {
     const handleClick = async () => {
         if (!validateForm()) return;
 
-        // store.restoreUserId должен быть сохранён после подтверждения кода
-        if (!store.restoreUserId) {
-            setFormErr('Не удалось определить пользователя. Пройдите восстановление заново.');
+        if (!store.restoreEmail || !store.restoreCode) {
+            setFormErr('Сессия истекла. Пройдите восстановление заново.');
             return;
         }
 
+        setIsLoading(true);
         try {
-            await store.resetPassword(password, store.restoreUserId);
+            await store.resetPassword(store.restoreEmail, store.restoreCode, password);
             navigate('/signin?recovery=true');
         } catch (e: unknown) {
             const msg = e instanceof Error ? e.message : 'Ошибка сервера';
             setFormErr(msg);
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -76,11 +76,7 @@ const RestoreFormWithPass: FC = () => {
                             type={showPassword ? "text" : "password"}
                             style={{ paddingRight: '50px' }}
                         />
-                        <button
-                            type="button"
-                            onClick={() => setShowPassword(!showPassword)}
-                            className="button_show_password"
-                        >
+                        <button type="button" onClick={() => setShowPassword(!showPassword)} className="button_show_password">
                             <EyeToggle show={showPassword} onToggle={() => setShowPassword(!showPassword)} />
                         </button>
                     </div>
@@ -100,11 +96,7 @@ const RestoreFormWithPass: FC = () => {
                             type={showRepeatPassword ? "text" : "password"}
                             style={{ paddingRight: '50px' }}
                         />
-                        <button
-                            type="button"
-                            onClick={() => setShowRepeatPassword(!showRepeatPassword)}
-                            className="button_show_password"
-                        >
+                        <button type="button" onClick={() => setShowRepeatPassword(!showRepeatPassword)} className="button_show_password">
                             <EyeToggle show={showRepeatPassword} onToggle={() => setShowRepeatPassword(!showRepeatPassword)} />
                         </button>
                     </div>
@@ -114,8 +106,8 @@ const RestoreFormWithPass: FC = () => {
             </div>
 
             <div className="sign-form__btn-container">
-                <Button onClick={handleClick} isBtn={true} className="button-type-2 sign-page-button">
-                    Сменить пароль
+                <Button onClick={handleClick} isBtn={true} className="button-type-2 sign-page-button" disabled={isLoading}>
+                    {isLoading ? 'Меняем пароль...' : 'Сменить пароль'}
                 </Button>
             </div>
         </form>

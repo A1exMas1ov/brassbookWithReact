@@ -176,15 +176,22 @@
     align-items: center;
 }
 
-.eyeIcon {
+  .button_show_password {
     position: absolute;
-    right: 10px;
-    background: transparent;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
     border: none;
     cursor: pointer;
-    color: #6b27ff;
+    font-size: 20px;
+    padding: 5px;
     display: flex;
     align-items: center;
+    justify-content: center;
+    color: #534068;
+    z-index: 2;
+    transition: opacity 0.2s ease;
 }
 
 .errorUnder {
