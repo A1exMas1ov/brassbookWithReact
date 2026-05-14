@@ -49,6 +49,7 @@
   letter-spacing: -0.48px;
   font-family: var(--main-font);
   font-weight: 600;
+  cursor: pointer;
 }
 
 .button__corporation {
@@ -58,6 +59,7 @@
   letter-spacing: -0.48px;
   font-family: var(--main-font);
   font-weight: 600;
+  cursor: pointer;
 }
 
 .button__personalact {

@@ -10,7 +10,6 @@ export interface ProfileResponse {
     photoUrl?: string;
     role: string;
     createdAt: string;
-    // попроси напарника добавить эти поля:
     companyName?: string;
     profession?: string;
     inn?: number;

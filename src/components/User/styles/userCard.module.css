@@ -33,7 +33,6 @@
   cursor: pointer;
 }
 
-/* Реальное фото */
 .card__photo__img {
   width: 100%;
   height: 100%;
@@ -42,7 +41,6 @@
   display: block;
 }
 
-/* Заглушка — иконка + текст по центру когда фото нет */
 .card__photo__placeholder {
   position: absolute;
   inset: 0;
@@ -72,7 +70,6 @@
   letter-spacing: -0.24px;
 }
 
-/* Плашка «Изменить фотографию» — поверх фото снизу слева */
 .card__photo__edit {
   position: absolute;
   bottom: 10px;
@@ -106,7 +103,6 @@
   flex-shrink: 0;
 }
 
-/* Скрытый input для загрузки файла */
 .card__photo__input {
   display: none;
 }
@@ -140,7 +136,6 @@
   gap: 6px;
 }
 
-/* ── Корпоративный блок: компания + должность + ИНН в строку ── */
 .card__info__corporate {
   width: 100%;
   display: flex;
@@ -159,19 +154,16 @@
   min-width: 0;
 }
 
-/* Компания занимает оставшееся место */
 .card__info__corporate__field--company {
   flex: 1;
   min-width: 0;
 }
 
-/* Должность тоже растягивается */
 .card__info__corporate__field--position {
   flex: 1;
   min-width: 0;
 }
 
-/* ИНН фиксированная ширина */
 .card__info__corporate__field--inn {
   flex-shrink: 0;
   width: 130px;
@@ -200,7 +192,6 @@
   text-overflow: ellipsis;
 }
 
-/* Для должности разрешаем перенос */
 .card__info__corporate__field--position .corporate__value {
   white-space: normal;
 }

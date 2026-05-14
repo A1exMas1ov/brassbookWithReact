@@ -52,9 +52,9 @@ export default class ProfileStore {
                 displayName:    p.displayName,
                 displaySurname: p.displaySurname,
                 email:          p.email,
-                companyName:    p.companyName, // Добавлено
-                profession:     p.profession,  // Добавлено
-                inn:            p.inn,         // Добавлено
+                companyName:    p.companyName,
+                profession:     p.profession,
+                inn:            p.inn,
             } as IUser);
         } catch (e: unknown) {
             console.error("Update profile error:", getErrorMessage(e));
@@ -76,7 +76,7 @@ export default class ProfileStore {
         }
     }
 
-    // Загрузка фото — когда напарник добавит PUT /profile/photo на бэке
+    // Загрузка фото — добавить PUT /profile/photo на бэке
     async uploadPhoto(file: File) {
         this.setPhotoUploading(true);
         try {
