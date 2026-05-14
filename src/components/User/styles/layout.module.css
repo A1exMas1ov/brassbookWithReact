@@ -40,11 +40,6 @@
   }
 }
 
-/* ── Global reset ── */
-body {
-  background-color: var(--color-bg);
-  margin: 0;
-}
 
 .div__menu {
   position: fixed;
@@ -86,6 +81,7 @@ body {
   min-height: 100vh;
   margin-left: var(--sidebar-width);
   box-sizing: border-box;
+   background-color: var(--color-bg);
 }
 
 /* ── Main area ── */

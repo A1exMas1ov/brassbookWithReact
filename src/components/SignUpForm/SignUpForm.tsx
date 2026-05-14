@@ -179,7 +179,7 @@ function SignUpForm({ className }: { className?: string }) {
                                         placeholder="Введите пароль"
                                         className={classes.sign__input3}
                                     />
-                                    <button type="button" className={classes.eyeIcon} onClick={() => setShowPassword(!showPassword)}>
+                                    <button type="button" className={classes.button_show_password} onClick={() => setShowPassword(!showPassword)}>
                                         {showPassword ? <FaEyeSlash /> : <FaEye />}
                                     </button>
                                 </div>
@@ -197,7 +197,7 @@ function SignUpForm({ className }: { className?: string }) {
                                         placeholder="Повторите пароль"
                                         className={classes.sign__input3}
                                     />
-                                    <button type="button" className={classes.eyeIcon} onClick={() => setShowRepeatPassword(!showRepeatPassword)}>
+                                    <button type="button" className={classes.button_show_password} onClick={() => setShowRepeatPassword(!showRepeatPassword)}>
                                         {showRepeatPassword ? <FaEyeSlash /> : <FaEye />}
                                     </button>
                                 </div>

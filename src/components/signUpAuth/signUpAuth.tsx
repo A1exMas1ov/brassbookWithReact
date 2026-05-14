@@ -86,6 +86,8 @@ function SignUpAuth() {
         } catch (e: unknown) {
             const msg = e instanceof Error ? e.message : 'Неверный или устаревший код';
             setErrorCode(msg);
+            setCode(['', '', '', '', '', '']);           // добавьте это
+            document.getElementById('code-0')?.focus();
         } finally {
             setIsLoading(false);
         }

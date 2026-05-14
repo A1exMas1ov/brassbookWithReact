@@ -132,6 +132,16 @@ export default class Store {
         }
     }
 
+    async verifyRestoreCode(email: string, code: string) {
+    try {
+        await AuthService.verifyRestoreCode(email, code);
+        return true;
+    } catch (e: unknown) {
+        console.error("Verify code error:", getErrorMessage(e));
+        throw new Error(getErrorMessage(e));
+    }
+    }
+
     // ── ВЫХОД ────────────────────────────────────────────────────────────
     async logout() {
         localStorage.removeItem('token');

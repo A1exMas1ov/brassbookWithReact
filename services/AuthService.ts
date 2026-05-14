@@ -39,5 +39,9 @@ export default class AuthService {
         return $api.put<void>('/registration', { email, code, password });
     }
 
+    static async verifyRestoreCode(email: string, code: string) {
+    return $api.post('/verifyCode', { email, code });
+    }
+
     // GET /api/v1/token/refresh — обновляется автоматически через интерцептор в index.ts
 }

@@ -15,6 +15,7 @@ function RestoreAuth() {
     const [canResend, setCanResend] = useState(false);
     const [errorCode, setErrorCode] = useState('');
     const [isResending, setIsResending] = useState(false);
+     const [isVerifying, setIsVerifying] = useState(false);
 
     useEffect(() => {
         if (timeLeft > 0) {
@@ -57,14 +58,25 @@ function RestoreAuth() {
         }
     };
 
-    const handleVerify = () => {
+    const handleVerify = async () => {
         const fullCode = code.join('');
         if (fullCode.length < 6) {
             setErrorCode('Введите все 6 цифр кода');
             return;
         }
-        store.restoreCode = fullCode;
-        navigate('/restore?success=true');
+        setIsVerifying(true);
+        try {
+            await store.verifyRestoreCode(store.restoreEmail, fullCode);
+            store.restoreCode = fullCode;
+            navigate('/restore?success=true');
+        } catch (e: unknown) {
+            const msg = e instanceof Error ? e.message : 'Неверный код';
+            setErrorCode(msg);
+            setCode(['', '', '', '', '', '']);
+            document.getElementById('code-0')?.focus();
+        } finally {
+            setIsVerifying(false);
+        }
     };
 
     return (
@@ -133,9 +145,9 @@ function RestoreAuth() {
                     isBtn={true}
                     className="button-type-2 sign-page-button"
                     onClick={handleVerify}
-                    disabled={isResending}
+                    disabled={isResending || isVerifying}
                 >
-                    Продолжить
+                    {isVerifying ? 'Проверяем...' : 'Продолжить'}
                 </Button>
                 <ImagePipe />
             </div>

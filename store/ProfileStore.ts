@@ -7,6 +7,7 @@ import { getErrorMessage } from "../utils/errorUtils";
 export default class ProfileStore {
     user = {} as IUser;
     isLoading = false;
+    isPhotoUploading = false;
 
     constructor() {
         makeAutoObservable(this);
@@ -14,6 +15,7 @@ export default class ProfileStore {
 
     setUser(user: IUser) { this.user = user; }
     setLoading(bool: boolean) { this.isLoading = bool; }
+    setPhotoUploading(bool: boolean) { this.isPhotoUploading = bool; }
 
     async fetchProfile() {
         this.setLoading(true);
@@ -47,9 +49,12 @@ export default class ProfileStore {
             const p = response.data;
             this.setUser({
                 ...this.user,
-                displayName: p.displayName,
+                displayName:    p.displayName,
                 displaySurname: p.displaySurname,
-                email: p.email,
+                email:          p.email,
+                companyName:    p.companyName,
+                profession:     p.profession,
+                inn:            p.inn,
             } as IUser);
         } catch (e: unknown) {
             console.error("Update profile error:", getErrorMessage(e));
@@ -68,6 +73,21 @@ export default class ProfileStore {
             throw e;
         } finally {
             this.setLoading(false);
+        }
+    }
+
+    // Загрузка фото — добавить PUT /profile/photo на бэке
+    async uploadPhoto(file: File) {
+        this.setPhotoUploading(true);
+        try {
+            const response = await ProfileService.uploadPhoto(file);
+            const p = response.data;
+            this.setUser({ ...this.user, photoUrl: p.photoUrl });
+        } catch (e: unknown) {
+            console.error("Upload photo error:", getErrorMessage(e));
+            throw e;
+        } finally {
+            this.setPhotoUploading(false);
         }
     }
 }

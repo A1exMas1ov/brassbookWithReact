@@ -10,7 +10,6 @@ export interface ProfileResponse {
     photoUrl?: string;
     role: string;
     createdAt: string;
-    // попроси напарника добавить эти поля:
     companyName?: string;
     profession?: string;
     inn?: number;
@@ -20,6 +19,9 @@ export interface UpdateProfileRequest {
     displayName?: string;
     displaySurname?: string;
     email?: string;
+    companyName?: string;
+    profession?: string;
+    inn?: number;
 }
 
 export interface ChangePasswordRequest {
@@ -46,5 +48,15 @@ export default class ProfileService {
     // DELETE /api/v1/profile
     static async deleteAccount(): Promise<AxiosResponse<void>> {
         return $api.delete<void>('/profile');
+    }
+
+    // PUT /api/v1/profile/photo — multipart/form-data
+    // Эндпоинта пока нет на бэке — заглушка готова к подключению
+    static uploadPhoto(file: File): Promise<AxiosResponse<ProfileResponse>> {
+        const formData = new FormData();
+        formData.append("photo", file);
+        return $api.put<ProfileResponse>("/profile/photo", formData, {
+            headers: { "Content-Type": "multipart/form-data" },
+        });
     }
 }

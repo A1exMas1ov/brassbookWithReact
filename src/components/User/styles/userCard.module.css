@@ -29,6 +29,82 @@
   background-color: rgba(248, 248, 250, 1);
   flex-shrink: 0;
   overflow: hidden;
+  position: relative;
+  cursor: pointer;
+}
+
+.card__photo__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+}
+
+.card__photo__placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 16px;
+  box-sizing: border-box;
+  cursor: pointer;
+}
+
+.card__photo__placeholder__icon {
+  width: 32px;
+  height: 32px;
+  color: var(--font-color-muted);
+}
+
+.card__photo__placeholder__text {
+  font-family: var(--main-font);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--font-color-muted);
+  text-align: center;
+  line-height: 1.4;
+  letter-spacing: -0.24px;
+}
+
+.card__photo__edit {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: #ffffff;
+  font-family: var(--main-font);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: -0.24px;
+  transition: background-color 0.15s ease;
+  z-index: 2;
+}
+
+.card__photo__edit:hover {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.card__photo__edit__icon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+.card__photo__input {
+  display: none;
 }
 
 /* ── Info ── */
@@ -49,20 +125,81 @@
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 32px;
+  gap: 24px;
   overflow: hidden;
 }
 
 .card__info__name {
   width: 100%;
+  display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
+}
+
+.card__info__corporate {
+  width: 100%;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background: var(--color-surface-dim);
+  border-radius: var(--radius-sm);
+  padding: 8px;
+  box-sizing: border-box;
+}
+
+.card__info__corporate__field {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.card__info__corporate__field--company {
+  flex: 1;
+  min-width: 0;
+}
+
+.card__info__corporate__field--position {
+  flex: 1;
+  min-width: 0;
+}
+
+.card__info__corporate__field--inn {
+  flex-shrink: 0;
+  width: 130px;
+}
+
+.corporate__label {
+  color: var(--font-color-muted);
+  font-family: var(--main-font);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: -0.22px;
+  line-height: 1.3;
+  margin: 0;
+  white-space: nowrap;
+}
+
+.corporate__value {
+  color: var(--font-color);
+  font-family: var(--main-font);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -0.26px;
+  line-height: 1.3;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.card__info__corporate__field--position .corporate__value {
+  white-space: normal;
 }
 
 .card__info__extra {
   width: 100%;
   max-width: 381px;
-  min-height: 82px;
+  min-height: 72px;
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -77,7 +214,7 @@
 /* ── Кнопки ── */
 .card__buttons {
   width: 100%;
-  max-width: 201px;
+  max-width: 220px;
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -134,7 +271,7 @@
   color: var(--font-color);
   font-family: var(--main-font);
   font-size: 18px;
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: -0.36px;
   line-height: 1.33;
   margin: 0;
@@ -233,9 +370,11 @@
   .card__info       { height: 270px; }
   .card__photo      { width: 170px; height: 270px; }
   .card__decoration { width: 200px; }
-  .card__info__main { gap: 20px; }
-  .card__info__extra { min-height: 72px; }
+  .card__info__main { gap: 16px; }
+  .card__info__extra { min-height: 60px; }
   .profile__value   { font-size: 16px; }
+  .card__info__corporate { flex-wrap: wrap; gap: 8px; }
+  .card__info__corporate__field--inn { width: auto; }
 }
 
 @media (min-width: 1441px) {
